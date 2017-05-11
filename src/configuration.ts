@@ -48,7 +48,13 @@ export default class Configuration implements LanguageConfig {
         const languagesConfig = config.get<any>('languages', {})
         for (const language of Object.keys(languagesConfig || {})) {
             const config = languagesConfig[language]
-            this.languageConfigurations.set(language, typeof config === 'boolean' ? {} : config)
+            if (typeof config === 'boolean') {
+                if (config) {
+                    this.languageConfigurations.set(language, {})
+                }
+            } else {
+                this.languageConfigurations.set(language, config)
+            }
         }
     }
 }
