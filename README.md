@@ -3,7 +3,7 @@
     <h1>:emojisense:</h1>
 </div>
 
-VS Code extension that adds suggestions and autocomplete for emoji.
+[VS Code extension](https://marketplace.visualstudio.com/items?itemName=bierner.emojisense) that adds suggestions and autocomplete for emoji.
 
 ![Example](/media/example.gif?raw=true)
 
