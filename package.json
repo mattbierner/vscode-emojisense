@@ -1,10 +1,10 @@
 {
   "name": "emojisense",
   "displayName": ":emojisense:",
-  "description": "Adds suggestions and autocomplete for emoji.",
+  "description": "Adds suggestions and autocomplete for emoji",
   "version": "0.0.1",
   "publisher": "bierner",
-  "icon": "/media/icon.svg",
+  "icon": "media/icon.svg",
   "keywords": [
     "emoji",
     "emojis",
