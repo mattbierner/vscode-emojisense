@@ -1,0 +1,88 @@
+{
+  "name": "emojisense",
+  "displayName": ":emojisense:",
+  "description": "Adds suggestions and autocomplete for emoji.",
+  "version": "0.0.1",
+  "publisher": "bierner",
+  "engines": {
+    "vscode": "^1.12.0"
+  },
+  "repository": {
+    "url": "https://github.com/mattbierner/vscode-emojisense.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mattbierner/vscode-emojisense/issues"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": ":emojisense:",
+      "properties": {
+        "emojisense.unicodeCompletionsEnabled": {
+          "type": "boolean",
+          "description": "Enable completions that insert emoji as unicode, i.e. :smile_cat: -> 😸",
+          "default": true
+        },
+        "emojisense.markupCompletionsEnabled": {
+          "type": "boolean",
+          "description": "Enable completions that insert emoji markdown, i.e. ::smile_cat -> :smile_cat:",
+          "default": true
+        },
+        "emojisense.languages": {
+          "type": "object",
+          "default": {
+            "markdown": true,
+            "plaintext": {
+              "markupCompletionsEnabled": false
+            },
+            "git-commit": true
+          },
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "unicodeCompletionsEnabled": {
+                    "type": "boolean",
+                    "description": "Enable completions that insert emoji as unicode, i.e. :smile_cat: -> 😸",
+                    "default": false
+                  },
+                  "markupCompletionsEnabled": {
+                    "type": "boolean",
+                    "description": "Enable completions that insert emoji markdown, i.e. ::smile_cat -> :smile_cat:",
+                    "default": false
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "main": "./out/src/extension",
+  "scripts": {
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "typescript": "^2.3.2",
+    "vscode": "^1.0.0",
+    "mocha": "^2.3.3",
+    "@types/node": "^6.0.40",
+    "@types/mocha": "^2.2.32"
+  },
+  "dependencies": {
+    "gemoji": "^4.1.0"
+  }
+}
