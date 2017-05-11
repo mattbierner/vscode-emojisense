@@ -35,6 +35,7 @@
         },
         "emojisense.languages": {
           "type": "object",
+          "description": "Controls which languages emojisense is active in. You can also customize emojisense settings per language.",
           "default": {
             "markdown": true,
             "plaintext": {

@@ -7,14 +7,17 @@ VS Code extension that adds suggestions and autocomplete for emoji.
 
 ![Example](/media/example.gif?raw=true)
 
+ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 
-# Features
+
+## Features
 
 - Quickly insert emoji using the `:smile:` syntax supported by Github and many other sites.
 - Insert emoji markup by typing `::`.
 - Enable and control emoji completion settings per language.
 
  [List of supported emoji][cheat]
+
 
 ## General Configuration
 
