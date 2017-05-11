@@ -1,10 +1,12 @@
 <div align="center">
-    <img src="/media/icon.png?raw=true" />
+    <img src="/media/icon.png?raw=true" alt=":emojisense:" />
     <h1>:emojisense:</h1>
 </div>
 
+VS Code extension that adds suggestions and autocomplete for emoji.
 
-![Alt text](/media/example.png?raw=true "Optional Title")
+![Example](/media/example.gif?raw=true)
+
 
 # Features
 
