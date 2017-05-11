@@ -5,6 +5,7 @@
   "version": "0.0.2",
   "publisher": "bierner",
   "icon": "media/icon.svg",
+  "license": "mit",
   "keywords": [
     "emoji",
     "emojis",
