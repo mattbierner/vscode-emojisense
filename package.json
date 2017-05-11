@@ -4,6 +4,13 @@
   "description": "Adds suggestions and autocomplete for emoji.",
   "version": "0.0.1",
   "publisher": "bierner",
+  "icon": "/media/icon.svg",
+  "keywords": [
+    "emoji",
+    "emojis",
+    "emoticon",
+    "emoticons"
+  ],
   "engines": {
     "vscode": "^1.12.0"
   },
