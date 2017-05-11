@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="/media/icon.png?raw=true" alt=":emojisense:" />
+    <img src="https://github.com/mattbierner/vscode-emojisense/raw/master/media/icon.png" alt=":emojisense:" />
     <h1>:emojisense:</h1>
 </div>
 
