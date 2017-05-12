@@ -49,8 +49,8 @@ export default class EmojiCompletionProvider implements CompletionItemProvider {
             return []
         }
         return this.emojiProvider.emojis.map(x => {
-            const item = new CompletionItem(`:${x.name}:`, CompletionItemKind.Text)
-            item.documentation = x.emoji
+            const item = new CompletionItem(`:${x.name}: — ${x.emoji}`, CompletionItemKind.Text)
+            item.detail = x.emoji
             item.insertText = x.emoji
             item.filterText = x.name
             item.range = replacementSpan
@@ -63,9 +63,8 @@ export default class EmojiCompletionProvider implements CompletionItemProvider {
             return []
         }
         return this.emojiProvider.emojis.map(x => {
-            const item = new CompletionItem(`::${x.name}`, CompletionItemKind.Text)
+            const item = new CompletionItem(`::${x.name} — ${x.emoji}`, CompletionItemKind.Text)
             item.detail = `:${x.name}:`
-            item.documentation = x.emoji
             item.insertText = `:${x.name}:`
             item.filterText = x.name
             item.range = replacementSpan

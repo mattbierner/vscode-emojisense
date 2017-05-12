@@ -27,7 +27,9 @@
 
 - `emojisense.showOnColon`: Should emoji completions automatically be shown when you type a colon? Enabled by default. If you disable `showOnColon`, it is recomended that you have `quickSuggestions` enabled.
 
+
 ## Per Language Configuration
+
 *Emojisense* is enabled by default in markdown, git commits, and plaintext files. You can enable it in other languages using `"emojisense.languages"`
 
 ```json
