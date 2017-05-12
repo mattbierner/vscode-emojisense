@@ -8,7 +8,7 @@
 ![Example](/media/example.gif?raw=true)
 
  Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
-
+ 
 
 ## Features
 
@@ -23,7 +23,9 @@
 
 - `emojisense.unicodeCompletionsEnabled`: Enable completions that insert emoji as unicode, i.e. `:smile_cat:` -> 😸
 
-- `unicodeCompletionsEnabled.markupCompletionsEnabled`: Enable completions that insert emoji markdown, i.e. `::smile_cat` -> `:smile_cat:`
+- `emojisense.markupCompletionsEnabled`: Enable completions that insert emoji markdown, i.e. `::smile_cat` -> `:smile_cat:`
+
+- `emojisense.showOnColon`: Should emoji completions automatically be shown when you type a colon? Enabled by default. If you disable `showOnColon`, it is recomended that you have `quickSuggestions` enabled.
 
 ## Per Language Configuration
 *Emojisense* is enabled by default in markdown, git commits, and plaintext files. You can enable it in other languages using `"emojisense.languages"`

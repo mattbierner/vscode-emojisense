@@ -19,29 +19,24 @@ export default class EmojiCompletionProvider implements CompletionItemProvider {
 
         const line = document.lineAt(position.line)
         const pre = line.text.slice(0, position.character)
-        const preMatch = pre.match(/:(:?)[\w\d_\+\-]*$/)
+
+        // Handle case of: `:cat:|`
+        const preExistingMatch = pre.match(/:[\w\d_\+\-]+:$/)
+
+        // If there is a character before the color, require at least one character after it
+        const preMatch = preExistingMatch || pre.match(/\B:(:?)$|:(:?)([\w\d_\+\-]+?)$/)
         if (!preMatch) {
             return []
         }
 
         const post = line.text.slice(position.character)
-        const postMatch = post.match(/[\w\d_\+\-]*:?/)
+        const postMatch = post.match(/[\w\d_\+\-]*?:?/)
 
-        let replacementSpan: Range;
+        const replacementSpan: Range = new Range(
+            position.translate(0, -preMatch[0].length),
+            postMatch ? position.translate(0, postMatch[0].length) : position)
 
-        // Handle case of: `:cat:|`
-        const preExistingMatch = pre.match(/:[\w\d_\+\-]+:$/);
-        if (preExistingMatch) {
-            replacementSpan = new Range(
-                position.translate(0, -preExistingMatch[0].length),
-                position)
-        } else {
-            replacementSpan = new Range(
-                position.translate(0, -preMatch[0].length),
-                postMatch ? position.translate(0, postMatch[0].length) : position)
-        }
-
-        if (pre.length >= 2 && preMatch[1] === ':') {
+        if (pre.length >= 2 && (preMatch[1] || preMatch[2])) {
             return this.getMarkupEmojiCompletions(document, replacementSpan)
         }
 
@@ -50,7 +45,7 @@ export default class EmojiCompletionProvider implements CompletionItemProvider {
     }
 
     private getUnicodeEmojiCompletions(document: TextDocument, replacementSpan: Range): CompletionItem[] {
-        if (!this.configuration.areUnicodeCompletionsEnabled(document)) {
+        if (!this.configuration.areUnicodeCompletionsEnabled(document.languageId)) {
             return []
         }
         return this.emojiProvider.emojis.map(x => {
@@ -64,7 +59,7 @@ export default class EmojiCompletionProvider implements CompletionItemProvider {
     }
 
     private getMarkupEmojiCompletions(document: TextDocument, replacementSpan: Range): CompletionItem[] {
-        if (!this.configuration.areMarkupCompletionsEnabled(document)) {
+        if (!this.configuration.areMarkupCompletionsEnabled(document.languageId)) {
             return []
         }
         return this.emojiProvider.emojis.map(x => {

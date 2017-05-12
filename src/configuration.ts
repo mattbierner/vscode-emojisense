@@ -3,6 +3,7 @@ import * as vscode from 'vscode'
 interface LanguageConfig {
     readonly unicodeCompletionsEnabled?: boolean
     readonly markupCompletionsEnabled?: boolean
+    readonly showOnColon?: boolean
 }
 
 export default class Configuration implements LanguageConfig {
@@ -10,6 +11,7 @@ export default class Configuration implements LanguageConfig {
 
     unicodeCompletionsEnabled: boolean
     markupCompletionsEnabled: boolean
+    showOnColon: boolean
 
     constructor() {
         this.updateConfiguration()
@@ -19,30 +21,35 @@ export default class Configuration implements LanguageConfig {
         return this.languageConfigurations.keys();
     }
 
-    public areUnicodeCompletionsEnabled(document: vscode.TextDocument): boolean {
-        return this.are('unicodeCompletionsEnabled', document)
+    public areUnicodeCompletionsEnabled(forLanguage: string): boolean {
+        return this.is('unicodeCompletionsEnabled', forLanguage)
     }
 
-    public areMarkupCompletionsEnabled(document: vscode.TextDocument): boolean {
-        return this.are('markupCompletionsEnabled', document)
+    public areMarkupCompletionsEnabled(forLanguage: string): boolean {
+        return this.is('markupCompletionsEnabled', forLanguage)
     }
 
-    private are(setting: keyof LanguageConfig, document: vscode.TextDocument): boolean {
-        const languageConfig = this.getLanguageConfig(document)
+    public shouldShowOnColon(forLanguage: string): boolean {
+        return this.is('showOnColon', forLanguage);
+    }
+
+    private is(setting: keyof LanguageConfig, forLanguage: string): boolean {
+        const languageConfig = this.getLanguageConfig(forLanguage)
         if (languageConfig && typeof languageConfig[setting] !== 'undefined') {
             return !!languageConfig[setting]
         }
         return this[setting]
     }
 
-    private getLanguageConfig(document: vscode.TextDocument): LanguageConfig {
-        return this.languageConfigurations.get(document.languageId) || {}
+    private getLanguageConfig(languageId: string): LanguageConfig {
+        return this.languageConfigurations.get(languageId) || {}
     }
 
     public updateConfiguration(): void {
         const config = vscode.workspace.getConfiguration('emojisense')
         this.unicodeCompletionsEnabled = config.get<boolean>('unicodeCompletionsEnabled', true)
         this.markupCompletionsEnabled = config.get<boolean>('markupCompletionsEnabled', true)
+        this.showOnColon = config.get<boolean>('showOnColon', true)
 
         this.languageConfigurations = new Map()
         const languagesConfig = config.get<any>('languages', {})

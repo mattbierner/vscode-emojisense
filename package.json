@@ -2,7 +2,7 @@
   "name": "emojisense",
   "displayName": ":emojisense:",
   "description": "Adds suggestions and autocomplete for emoji",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "publisher": "bierner",
   "icon": "media/icon.svg",
   "license": "mit",
@@ -39,6 +39,11 @@
         "emojisense.markupCompletionsEnabled": {
           "type": "boolean",
           "description": "Enable completions that insert emoji markdown, i.e. ::smile_cat -> :smile_cat:",
+          "default": true
+        },
+        "emojisense.showOnColon": {
+          "type": "boolean",
+          "description": "Should emoji completions automatically be shown when you type a colon?",
           "default": true
         },
         "emojisense.languages": {
