@@ -4,6 +4,7 @@ interface LanguageConfig {
     readonly unicodeCompletionsEnabled?: boolean
     readonly markupCompletionsEnabled?: boolean
     readonly showOnColon?: boolean
+    readonly hoverEnabled?: boolean
 }
 
 export default class Configuration implements LanguageConfig {
@@ -12,6 +13,7 @@ export default class Configuration implements LanguageConfig {
     unicodeCompletionsEnabled: boolean
     markupCompletionsEnabled: boolean
     showOnColon: boolean
+    hoverEnabled: boolean
 
     constructor() {
         this.updateConfiguration()
@@ -33,6 +35,10 @@ export default class Configuration implements LanguageConfig {
         return this.is('showOnColon', forLanguage);
     }
 
+    public isHoverEnabled(forLanguage: string): boolean {
+        return this.is('hoverEnabled', forLanguage);
+    }
+
     private is(setting: keyof LanguageConfig, forLanguage: string): boolean {
         const languageConfig = this.getLanguageConfig(forLanguage)
         if (languageConfig && typeof languageConfig[setting] !== 'undefined') {
@@ -50,6 +56,7 @@ export default class Configuration implements LanguageConfig {
         this.unicodeCompletionsEnabled = config.get<boolean>('unicodeCompletionsEnabled', true)
         this.markupCompletionsEnabled = config.get<boolean>('markupCompletionsEnabled', true)
         this.showOnColon = config.get<boolean>('showOnColon', true)
+        this.hoverEnabled = config.get<boolean>('hoverEnabled', true)
 
         this.languageConfigurations = new Map()
         const languagesConfig = config.get<any>('languages', {})

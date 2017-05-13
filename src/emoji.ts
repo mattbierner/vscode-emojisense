@@ -1,4 +1,4 @@
-import { CompletionItem, TextDocument, Position, Range, CompletionItemKind, CompletionItemProvider, CancellationToken, ProviderResult } from "vscode"
+import { CompletionItem, TextDocument, Position, Range, CompletionItemKind, CompletionItemProvider, CancellationToken, ProviderResult } from 'vscode'
 
 
 export interface Emoji {
@@ -8,21 +8,27 @@ export interface Emoji {
 }
 
 export class EmojiProvider {
-    private _emojis: Array<Emoji> | null = null;
+    private _emojiMap: Map<string, Emoji> | null = null;
 
-    public get emojis(): Emoji[] {
-        if (!this._emojis) {
+    public get emojis(): Iterable<Emoji> {
+        return this.emojiMap.values()
+    }
+
+    public lookup(name: string): Emoji | undefined {
+        return this.emojiMap.get(name.toLowerCase());
+    }
+
+    private get emojiMap(): Map<string, Emoji> {
+        if (!this._emojiMap) {
             const gemoji = require('gemoji')
-            const names = new Set<string>()
-            this._emojis = []
+            this._emojiMap = new Map<string, Emoji>()
             for (const key of Object.keys(gemoji.name)) {
-                const entry  = gemoji.name[key]
-                if (!names.has(entry.name)) {
-                    names.add(entry.name)
-                    this._emojis.push(entry)
+                const entry = gemoji.name[key]
+                if (!this._emojiMap.has(entry.name)) {
+                    this._emojiMap.set(entry.name, entry)
                 }
             }
         }
-        return this._emojis;
+        return this._emojiMap;
     }
 }

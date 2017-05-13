@@ -48,8 +48,8 @@ export default class EmojiCompletionProvider implements CompletionItemProvider {
         if (!this.configuration.areUnicodeCompletionsEnabled(document.languageId)) {
             return []
         }
-        return this.emojiProvider.emojis.map(x => {
-            const item = new CompletionItem(`:${x.name}: — ${x.emoji}`, CompletionItemKind.Text)
+        return Array.from(this.emojiProvider.emojis).map(x => {
+            const item = new CompletionItem(`:${x.name}:`, CompletionItemKind.Text)
             item.detail = x.emoji
             item.insertText = x.emoji
             item.filterText = x.name
@@ -62,8 +62,8 @@ export default class EmojiCompletionProvider implements CompletionItemProvider {
         if (!this.configuration.areMarkupCompletionsEnabled(document.languageId)) {
             return []
         }
-        return this.emojiProvider.emojis.map(x => {
-            const item = new CompletionItem(`::${x.name} — ${x.emoji}`, CompletionItemKind.Text)
+        return Array.from(this.emojiProvider.emojis).map(x => {
+            const item = new CompletionItem(`::${x.name}`, CompletionItemKind.Text)
             item.detail = `:${x.name}:`
             item.insertText = `:${x.name}:`
             item.filterText = x.name

@@ -1,14 +1,8 @@
-<div align="center">
-    <img src="https://github.com/mattbierner/vscode-emojisense/raw/master/media/icon.png" alt=":emojisense:" />
-    <h1>:emojisense:</h1>
-</div>
-
-[VS Code extension](https://marketplace.visualstudio.com/items?itemName=bierner.emojisense) that adds suggestions and autocomplete for emoji.
+Adds suggestions and autocomplete for emoji.
 
 ![Example](/media/example.gif?raw=true)
 
- Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
- 
+Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 
 ## Features
 
@@ -16,8 +10,8 @@
 - Insert emoji markup by typing `::`
 - Enable and control emoji completion settings per language
 
- [List of supported emoji][cheat]
-
+[List of supported emoji][cheat]
+:cry:
 
 ## General Configuration
 

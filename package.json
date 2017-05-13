@@ -46,6 +46,11 @@
           "description": "Should emoji completions automatically be shown when you type a colon?",
           "default": true
         },
+         "emojisense.hoverEnabled": {
+          "type": "boolean",
+          "description": "Enable hover to preview emoji?",
+          "default": true
+        },
         "emojisense.languages": {
           "type": "object",
           "description": "Controls which languages emojisense is active in. You can also customize emojisense settings per language.",
@@ -97,6 +102,7 @@
     "@types/mocha": "^2.2.32"
   },
   "dependencies": {
+    "data-uri": "0.0.3",
     "gemoji": "^4.1.0"
   }
 }
