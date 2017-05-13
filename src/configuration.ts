@@ -4,7 +4,7 @@ interface LanguageConfig {
     readonly unicodeCompletionsEnabled?: boolean
     readonly markupCompletionsEnabled?: boolean
     readonly showOnColon?: boolean
-    readonly hoverEnabled?: boolean
+    readonly emojiDecoratorsEnabled?: boolean
 }
 
 export default class Configuration implements LanguageConfig {
@@ -13,7 +13,7 @@ export default class Configuration implements LanguageConfig {
     unicodeCompletionsEnabled: boolean
     markupCompletionsEnabled: boolean
     showOnColon: boolean
-    hoverEnabled: boolean
+    emojiDecoratorsEnabled: boolean
 
     constructor() {
         this.updateConfiguration()
@@ -35,20 +35,21 @@ export default class Configuration implements LanguageConfig {
         return this.is('showOnColon', forLanguage);
     }
 
-    public isHoverEnabled(forLanguage: string): boolean {
-        return this.is('hoverEnabled', forLanguage);
+    public isInlineEnabled(forLanguage: string): boolean {
+        return this.is('emojiDecoratorsEnabled', forLanguage);
     }
 
     private is(setting: keyof LanguageConfig, forLanguage: string): boolean {
         const languageConfig = this.getLanguageConfig(forLanguage)
-        if (languageConfig && typeof languageConfig[setting] !== 'undefined') {
-            return !!languageConfig[setting]
+        if (!languageConfig) {
+            return false
         }
-        return this[setting]
+
+        return typeof languageConfig[setting] !== 'undefined' ? !!languageConfig[setting] : this[setting];
     }
 
-    private getLanguageConfig(languageId: string): LanguageConfig {
-        return this.languageConfigurations.get(languageId) || {}
+    private getLanguageConfig(languageId: string): LanguageConfig | undefined {
+        return this.languageConfigurations.get(languageId)
     }
 
     public updateConfiguration(): void {
@@ -56,7 +57,7 @@ export default class Configuration implements LanguageConfig {
         this.unicodeCompletionsEnabled = config.get<boolean>('unicodeCompletionsEnabled', true)
         this.markupCompletionsEnabled = config.get<boolean>('markupCompletionsEnabled', true)
         this.showOnColon = config.get<boolean>('showOnColon', true)
-        this.hoverEnabled = config.get<boolean>('hoverEnabled', true)
+        this.emojiDecoratorsEnabled = config.get<boolean>('emojiDecoratorsEnabled', true)
 
         this.languageConfigurations = new Map()
         const languagesConfig = config.get<any>('languages', {})

@@ -24,7 +24,7 @@ export default class EmojiCompletionProvider implements CompletionItemProvider {
         const preExistingMatch = pre.match(/:[\w\d_\+\-]+:$/)
 
         // If there is a character before the color, require at least one character after it
-        const preMatch = preExistingMatch || pre.match(/\B:(:?)$|:(:?)([\w\d_\+\-]+?)$/)
+        const preMatch = preExistingMatch || pre.match(/(?:\s|^)(:(:?)$)|(:(:?)[\w\d_\+\-]+?)$/)
         if (!preMatch) {
             return []
         }
@@ -33,10 +33,10 @@ export default class EmojiCompletionProvider implements CompletionItemProvider {
         const postMatch = post.match(/[\w\d_\+\-]*?:?/)
 
         const replacementSpan: Range = new Range(
-            position.translate(0, -preMatch[0].length),
+            position.translate(0, -(preMatch[1] || preMatch[3]).length),
             postMatch ? position.translate(0, postMatch[0].length) : position)
 
-        if (pre.length >= 2 && (preMatch[1] || preMatch[2])) {
+        if (pre.length >= 2 && (preMatch[2] || preMatch[4])) {
             return this.getMarkupEmojiCompletions(document, replacementSpan)
         }
 
@@ -65,6 +65,7 @@ export default class EmojiCompletionProvider implements CompletionItemProvider {
         return Array.from(this.emojiProvider.emojis).map(x => {
             const item = new CompletionItem(`::${x.name}`, CompletionItemKind.Text)
             item.detail = `:${x.name}:`
+            item.documentation = x.emoji
             item.insertText = `:${x.name}:`
             item.filterText = x.name
             item.range = replacementSpan

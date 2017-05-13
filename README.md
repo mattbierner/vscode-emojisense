@@ -1,4 +1,4 @@
-Adds suggestions and autocomplete for emoji.
+Adds suggestions and autocomplete for emoji to VS Code.
 
 ![Example](/media/example.gif?raw=true)
 
@@ -9,9 +9,9 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 - Quickly insert emoji using the `:smile:` syntax supported by Github and many other sites
 - Insert emoji markup by typing `::`
 - Enable and control emoji completion settings per language
+- See emoji previews of `:smile:` style markup inline
 
 [List of supported emoji][cheat]
-:cry:
 
 ## General Configuration
 
@@ -21,6 +21,7 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 
 - `emojisense.showOnColon`: Should emoji completions automatically be shown when you type a colon? Enabled by default. If you disable `showOnColon`, it is recomended that you have `quickSuggestions` enabled.
 
+- `emojisense.emojiDecoratorsEnabled`: Show emoji decorators inline for `:smile_cat:` markup in a file? Enabled by default in markdown.
 
 ## Per Language Configuration
 
@@ -41,7 +42,8 @@ You can also change the settings for each language. Here's the default emojisens
 "emojisense.languages": {
     "markdown": true,
     "plaintext": {
-        "markupCompletionsEnabled": false
+        "markupCompletionsEnabled": false,
+        "emojisense.emojiDecoratorsEnabled": false
     },
     "git-commit": true
 }

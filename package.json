@@ -2,10 +2,10 @@
   "name": "emojisense",
   "displayName": ":emojisense:",
   "description": "Adds suggestions and autocomplete for emoji",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "bierner",
   "icon": "media/icon.svg",
-  "license": "mit",
+  "license": "MIT",
   "keywords": [
     "emoji",
     "emojis",
@@ -38,7 +38,7 @@
         },
         "emojisense.markupCompletionsEnabled": {
           "type": "boolean",
-          "description": "Enable completions that insert emoji markdown, i.e. ::smile_cat -> :smile_cat:",
+          "description": "Enable completions that insert emoji markup, i.e. ::smile_cat -> :smile_cat:",
           "default": true
         },
         "emojisense.showOnColon": {
@@ -46,9 +46,9 @@
           "description": "Should emoji completions automatically be shown when you type a colon?",
           "default": true
         },
-         "emojisense.hoverEnabled": {
+        "emojisense.emojiDecoratorsEnabled": {
           "type": "boolean",
-          "description": "Enable hover to preview emoji?",
+          "description": "Enables or disables emoji decorators for emoji markup",
           "default": true
         },
         "emojisense.languages": {
@@ -57,7 +57,8 @@
           "default": {
             "markdown": true,
             "plaintext": {
-              "markupCompletionsEnabled": false
+              "markupCompletionsEnabled": false,
+              "emojiDecoratorsEnabled": false
             },
             "git-commit": true
           },
