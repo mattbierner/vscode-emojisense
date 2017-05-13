@@ -2,7 +2,7 @@
   "name": "emojisense",
   "displayName": ":emojisense:",
   "description": "Adds suggestions and autocomplete for emoji",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publisher": "bierner",
   "icon": "media/icon.svg",
   "license": "MIT",
@@ -103,7 +103,7 @@
     "@types/mocha": "^2.2.32"
   },
   "dependencies": {
-    "data-uri": "0.0.3",
+    "datauri": "^1.0.4",
     "gemoji": "^4.1.0"
   }
 }
