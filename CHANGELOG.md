@@ -1,6 +1,9 @@
 # Change Log
 
-## 0.1.0 - May 13, 2017
+## 0.2.1 - May 13, 2017
+* Fix wrong datauri package listed in package.json
+
+## 0.2.0 - May 13, 2017
 * Continue tweaking when emojis are shown.
 * Added support for showing emoji decorators inline for `:rocket:` sytax. Can also view large previews of the emojis by hovering
 
