@@ -79,7 +79,7 @@ export default class DecoratorProvider extends vscode.Disposable {
                     after: {
                         contentText: emoji.emoji,
                         margin: '0.2em',
-                        color: 'rgba(255, 255, 255, 0.4)'
+                        color: 'rgba(255, 255, 255, 0.55)'
                     }
                 }
             })

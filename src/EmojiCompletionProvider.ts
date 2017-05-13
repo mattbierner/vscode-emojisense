@@ -49,11 +49,10 @@ export default class EmojiCompletionProvider implements CompletionItemProvider {
             return []
         }
         return Array.from(this.emojiProvider.emojis).map(x => {
-            const item = new CompletionItem(`:${x.name}: — ${x.emoji}`, CompletionItemKind.Text)
+            const item = new CompletionItem(`:${x.name}:`, CompletionItemKind.Text)
             item.detail = x.emoji
             item.insertText = x.emoji
             item.filterText = x.name
-            item.sortText = x.name
             item.range = replacementSpan
             return item
         })
