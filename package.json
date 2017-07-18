@@ -2,9 +2,9 @@
   "name": "emojisense",
   "displayName": ":emojisense:",
   "description": "Adds suggestions and autocomplete for emoji",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "publisher": "bierner",
-  "icon": "media/icon.svg",
+  "icon": "media/icon.png",
   "license": "MIT",
   "keywords": [
     "emoji",

@@ -52,7 +52,6 @@ export default class EmojiCompletionProvider implements CompletionItemProvider {
             const item = new CompletionItem(`:${x.name}:`, CompletionItemKind.Text)
             item.detail = x.emoji
             item.insertText = x.emoji
-            item.filterText = x.name
             item.range = replacementSpan
             return item
         })
@@ -67,7 +66,6 @@ export default class EmojiCompletionProvider implements CompletionItemProvider {
             item.detail = `:${x.name}:`
             item.documentation = x.emoji
             item.insertText = `:${x.name}:`
-            item.filterText = x.name
             item.range = replacementSpan
             return item
         })

@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.2.3 - July 17, 2017
+* Fix for VS Code 1.14 filterText changes
+
 ## 0.2.2 - May 13, 2017
 * Increase opacity of inline emoji preview to work better across a range of themes.
 
