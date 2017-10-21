@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.3.0 - October 21, 2017
+* Show emoji in completion list view
+* Show large emoji in completion details view
+
 ## 0.2.3 - July 17, 2017
 * Fix for VS Code 1.14 filterText changes
 
