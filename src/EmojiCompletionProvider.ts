@@ -1,4 +1,4 @@
-import { CompletionItem, TextDocument, Position, Range, CompletionItemKind, CompletionItemProvider, CancellationToken, ProviderResult } from "vscode"
+import { CompletionItem, TextDocument, Position, Range, CompletionItemKind, CompletionItemProvider, CancellationToken, ProviderResult, MarkdownString } from "vscode"
 import { EmojiProvider } from './emoji'
 import Configuration from './configuration'
 
@@ -33,7 +33,7 @@ export default class EmojiCompletionProvider implements CompletionItemProvider {
         const postMatch = post.match(/[\w\d_\+\-]*?:?/)
 
         const replacementSpan: Range = new Range(
-            position.translate(0, -(preMatch[1] || preMatch[3]).length),
+            position.translate(0, -(preMatch[1] || preMatch[3] || '').length),
             postMatch ? position.translate(0, postMatch[0].length) : position)
 
         if (pre.length >= 2 && (preMatch[2] || preMatch[4])) {
@@ -49,8 +49,9 @@ export default class EmojiCompletionProvider implements CompletionItemProvider {
             return []
         }
         return Array.from(this.emojiProvider.emojis).map(x => {
-            const item = new CompletionItem(`:${x.name}:`, CompletionItemKind.Text)
-            item.detail = x.emoji
+            const item = new CompletionItem(`:${x.name}: ${x.emoji}`, CompletionItemKind.Text)
+            item.filterText = `:${x.name}:`
+            item.documentation = new MarkdownString(`# ${x.emoji}`)
             item.insertText = x.emoji
             item.range = replacementSpan
             return item
@@ -62,9 +63,9 @@ export default class EmojiCompletionProvider implements CompletionItemProvider {
             return []
         }
         return Array.from(this.emojiProvider.emojis).map(x => {
-            const item = new CompletionItem(`::${x.name}`, CompletionItemKind.Text)
-            item.detail = `:${x.name}:`
-            item.documentation = x.emoji
+            const item = new CompletionItem(`::${x.name} ${x.emoji}`, CompletionItemKind.Text)
+            item.filterText = `::${x.name}`;
+            item.documentation = new MarkdownString(`# ${x.emoji}`)
             item.insertText = `:${x.name}:`
             item.range = replacementSpan
             return item
