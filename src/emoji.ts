@@ -2,9 +2,8 @@ import { CompletionItem, TextDocument, Position, Range, CompletionItemKind, Comp
 
 
 export interface Emoji {
-    name: string
-    emoji: string
-    documentation: string;
+    readonly name: string
+    readonly emoji: string
 }
 
 export class EmojiProvider {
@@ -15,7 +14,7 @@ export class EmojiProvider {
     }
 
     public lookup(name: string): Emoji | undefined {
-        return this.emojiMap.get(name.toLowerCase());
+        return this.emojiMap.get(name.toLowerCase())
     }
 
     private get emojiMap(): Map<string, Emoji> {
@@ -24,8 +23,10 @@ export class EmojiProvider {
             this._emojiMap = new Map<string, Emoji>()
             for (const key of Object.keys(gemoji.name)) {
                 const entry = gemoji.name[key]
-                if (!this._emojiMap.has(entry.name)) {
-                    this._emojiMap.set(entry.name, entry)
+                for (const name of entry.names) {
+                    if (!this._emojiMap.has(name)) {
+                        this._emojiMap.set(name, {name, emoji: entry.emoji })
+                    }
                 }
             }
         }
