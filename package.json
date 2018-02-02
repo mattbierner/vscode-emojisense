@@ -104,6 +104,6 @@
   },
   "dependencies": {
     "datauri": "^1.0.4",
-    "gemoji": "^4.1.0"
+    "gemoji": "^4.2.0"
   }
 }
