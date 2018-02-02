@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.4.0 - February 2, 2018
+- Also register alt names for all entries
+
 ## 0.3.0 - October 21, 2017
 * Show emoji in completion list view
 * Show large emoji in completion details view
