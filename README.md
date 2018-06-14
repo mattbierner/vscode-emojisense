@@ -19,7 +19,7 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 
 - `emojisense.markupCompletionsEnabled`: Enable completions that insert emoji markup, i.e. `::smile_cat` -> `:smile_cat:`
 
-- `emojisense.showOnColon`: Should emoji completions automatically be shown when you type a colon? Enabled by default. If you disable `showOnColon`, it is recomended that you have `quickSuggestions` enabled.
+- `emojisense.showOnColon`: Should emoji completions automatically be shown when you type a colon? Enabled by default. If you disable `showOnColon`, it is recommended that you have `quickSuggestions` enabled.
 
 - `emojisense.emojiDecoratorsEnabled`: Show emoji decorators inline for `:smile_cat:` markup in a file? Enabled by default in markdown.
 
@@ -35,6 +35,8 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
     "json": true
 }
 ```
+
+The language keys here come from [VS Code's list of language identifiers](https://code.visualstudio.com/docs/languages/identifiers)
 
 You can also change the settings for each language. Here's the default emojisense configuration for example:
 

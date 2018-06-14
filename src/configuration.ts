@@ -13,7 +13,7 @@ export default class Configuration implements LanguageConfig {
     unicodeCompletionsEnabled: boolean = true
     markupCompletionsEnabled: boolean = true
     showOnColon: boolean = true
-    emojiDecoratorsEnabled: boolean = true;
+    emojiDecoratorsEnabled: boolean = true
 
     constructor() {
         this.updateConfiguration()
@@ -49,7 +49,7 @@ export default class Configuration implements LanguageConfig {
     }
 
     private getLanguageConfig(languageId: string): LanguageConfig | undefined {
-        return this.languageConfigurations.get(languageId)
+        return this.languageConfigurations.get(languageId.toLowerCase())
     }
 
     public updateConfiguration(): void {
@@ -63,12 +63,13 @@ export default class Configuration implements LanguageConfig {
         const languagesConfig = config.get<any>('languages', {})
         for (const language of Object.keys(languagesConfig || {})) {
             const config = languagesConfig[language]
+            const languageName = language.toLowerCase();
             if (typeof config === 'boolean') {
                 if (config) {
-                    this.languageConfigurations.set(language, {})
+                    this.languageConfigurations.set(languageName, {})
                 }
             } else {
-                this.languageConfigurations.set(language, config)
+                this.languageConfigurations.set(languageName, config)
             }
         }
     }
