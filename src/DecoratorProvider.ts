@@ -6,7 +6,7 @@ const Datauri = require('datauri')
 
 export default class DecoratorProvider extends vscode.Disposable {
 
-    private readonly disposables: vscode.Disposable[]
+    private readonly disposables: vscode.Disposable[] = []
 
     private readonly decorationType: vscode.TextEditorDecorationType
 

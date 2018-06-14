@@ -8,12 +8,12 @@ interface LanguageConfig {
 }
 
 export default class Configuration implements LanguageConfig {
-    private languageConfigurations: Map<string, LanguageConfig>
+    private languageConfigurations = new Map<string, LanguageConfig>();
 
-    unicodeCompletionsEnabled: boolean
-    markupCompletionsEnabled: boolean
-    showOnColon: boolean
-    emojiDecoratorsEnabled: boolean
+    unicodeCompletionsEnabled: boolean = true
+    markupCompletionsEnabled: boolean = true
+    showOnColon: boolean = true
+    emojiDecoratorsEnabled: boolean = true;
 
     constructor() {
         this.updateConfiguration()
