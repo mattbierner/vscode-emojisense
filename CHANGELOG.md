@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.4.1 - June 13, 2018
+- Update gemoji
+- Lowercase language keys
+
 ## 0.4.0 - February 2, 2018
 - Also register alt names for all entries
 
