@@ -23,7 +23,7 @@ export default class EmojiCompletionProvider implements CompletionItemProvider {
         // Handle case of: `:cat:|`
         const preExistingMatch = pre.match(/:[\w\d_\+\-]+:$/)
 
-        // If there is a character before the color, require at least one character after it
+        // If there is a character before the colon, require at least one character after it
         const preMatch = preExistingMatch || pre.match(/(?:\s|^)(:(:?)$)|(:(:?)[\w\d_\+\-]+?)$/)
         if (!preMatch) {
             return []
