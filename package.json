@@ -88,7 +88,7 @@
       }
     }
   },
-  "main": "./out/src/extension",
+  "main": "./out/extension",
   "scripts": {
     "vscode:prepublish": "tsc -p ./",
     "compile": "tsc -watch -p ./",
@@ -103,7 +103,7 @@
     "@types/mocha": "^2.2.32"
   },
   "dependencies": {
-    "datauri": "^1.0.4",
-    "gemoji": "^4.2.0"
+    "datauri": "^1.1.0",
+    "gemoji": "^4.2.1"
   }
 }
