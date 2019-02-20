@@ -31,6 +31,11 @@
     "configuration": {
       "title": ":emojisense:",
       "properties": {
+        "emojisense.enableEmojisInAllLanguages": {
+          "type": "boolean",
+          "description": "Lets you easily enable emoji decorators in ALL languages",
+          "default": true
+        },
         "emojisense.unicodeCompletionsEnabled": {
           "type": "boolean",
           "description": "Enable completions that insert emoji as unicode, i.e. :smile_cat: -> 😸",
