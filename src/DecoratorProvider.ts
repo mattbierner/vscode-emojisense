@@ -55,7 +55,11 @@ export default class DecoratorProvider extends vscode.Disposable {
     }
 
     private setDecorators(activeEditor: vscode.TextEditor | undefined) {
-        if (!activeEditor || !this.config.isInlineEnabled(activeEditor.document.languageId)) {
+        if (
+            !activeEditor || 
+            (!this.config.areEmojisEnabledInAllLangauges() &&
+            !this.config.isInlineEnabled(activeEditor.document.languageId))
+        ) {
             return false
         }
 
