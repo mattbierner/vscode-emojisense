@@ -96,9 +96,9 @@
     "test": "node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
+    "@types/node": "^10.3.3",
     "typescript": "^2.9.2",
-    "vscode": "^1.0.0",
-    "@types/node": "^10.3.3"
+    "vscode": "^1.1.29"
   },
   "dependencies": {
     "datauri": "^1.1.0",
