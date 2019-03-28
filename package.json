@@ -13,7 +13,7 @@
     "emoticons"
   ],
   "engines": {
-    "vscode": "^1.17.0"
+    "vscode": "^1.29.0"
   },
   "repository": {
     "url": "https://github.com/mattbierner/vscode-emojisense.git"
@@ -99,7 +99,7 @@
   "devDependencies": {
     "tslint": "^5.15.0",
     "typescript": "^2.9.2",
-    "vscode": "^1.0.0",
+    "vscode": "^1.1.29",
     "@types/node": "^10.3.3"
   },
   "dependencies": {
