@@ -3,6 +3,7 @@ import EmojiCompletionProvider from './EmojiCompletionProvider'
 import { EmojiProvider } from './emoji'
 import Configuration from './configuration'
 import DecoratorProvider from "./DecoratorProvider";
+import { quickEmoji } from "./quickEmoji";
 
 function registerProviders(
     provider: EmojiCompletionProvider,
@@ -28,6 +29,13 @@ export function activate(context: vscode.ExtensionContext) {
 
     let providerSub = registerProviders(provider, config)
 
+    const emojiPicker = quickEmoji(emoji);
+    context.subscriptions.push(
+        vscode.commands.registerCommand('quickEmoji', emojiPicker('emoji'))
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand('quickEmojitext', emojiPicker('name'))
+    );
     vscode.workspace.onDidChangeConfiguration(() => {
         config.updateConfiguration()
         providerSub.dispose()

@@ -28,6 +28,16 @@
     "*"
   ],
   "contributes": {
+    "commands": [
+      {
+        "command": "quickEmoji",
+        "title": "Pick an emoji"
+      },
+      {
+        "command": "quickEmojitext",
+        "title": "Pick an :emoji:"
+      }
+    ],
     "configuration": {
       "title": ":emojisense:",
       "properties": {
