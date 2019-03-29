@@ -10,6 +10,7 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 - Insert emoji markup by typing `::`
 - Enable and control emoji completion settings per language
 - See emoji previews of `:smile:` style markup inline
+- Provide an emoji picker to select and insert your emoji. (notably in the terminal) :wink:
 
 [List of supported emoji][cheat]
 
