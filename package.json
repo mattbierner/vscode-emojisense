@@ -53,14 +53,6 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "emojisense.quickEmoji",
-          "when": "textInputFocus"
-        },
-        {
-          "command": "emojisense.quickEmojitext",
-          "when": "textInputFocus"
-        },
-        {
           "command": "emojisense.quickEmojiTerminal",
           "when": "panelFocus && activeViewlet == 'workbench.panel.terminal'"
         },
