@@ -31,13 +31,41 @@
     "commands": [
       {
         "command": "quickEmoji",
-        "title": "Pick an emoji"
+        "title": "Pick an emoji and insert in editor"
       },
       {
         "command": "quickEmojitext",
-        "title": "Pick an :emoji:"
+        "title": "Pick an :emoji: and insert in editor"
+      },
+      {
+        "command": "quickEmojiTerminal",
+        "title": "Pick an emoji and insert in terminal"
+      },
+      {
+        "command": "quickEmojitextTerminal",
+        "title": "Pick an :emoji: and insert in terminal"
       }
     ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "quickEmoji",
+          "when": "editorFocus"
+        },
+        {
+          "command": "quickEmojitext",
+          "when": "editorFocus"
+        },
+        {
+          "command": "quickEmojiTerminal",
+          "when": "panelFocus && activeViewlet == 'workbench.panel.terminal'"
+        },
+        {
+          "command": "quickEmojitextTerminal",
+          "when": "panelFocus && activeViewlet == 'workbench.panel.terminal'"
+        }
+      ]
+    },
     "configuration": {
       "title": ":emojisense:",
       "properties": {

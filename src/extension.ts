@@ -31,10 +31,16 @@ export function activate(context: vscode.ExtensionContext) {
 
     const emojiPicker = quickEmoji(emoji);
     context.subscriptions.push(
-        vscode.commands.registerCommand('quickEmoji', emojiPicker('emoji'))
+        vscode.commands.registerCommand('quickEmoji', emojiPicker('emoji', 'editor'))
     );
     context.subscriptions.push(
-        vscode.commands.registerCommand('quickEmojitext', emojiPicker('name'))
+        vscode.commands.registerCommand('quickEmojitext', emojiPicker('name', 'editor'))
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand('quickEmojiTerminal', emojiPicker('emoji', 'terminal'))
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand('quickEmojitextTerminal', emojiPicker('name', 'terminal'))
     );
     vscode.workspace.onDidChangeConfiguration(() => {
         config.updateConfiguration()
