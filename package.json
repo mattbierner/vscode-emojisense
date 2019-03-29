@@ -30,42 +30,72 @@
   "contributes": {
     "commands": [
       {
-        "command": "quickEmoji",
-        "title": "Pick an emoji and insert in editor"
+        "command": "emojisense.quickEmoji",
+        "title": "Pick an emoji and insert in editor",
+        "category": "Emojisense"
       },
       {
-        "command": "quickEmojitext",
-        "title": "Pick an :emoji: and insert in editor"
+        "command": "emojisense.quickEmojitext",
+        "title": "Pick an :emoji: and insert in editor",
+        "category": "Emojisense"
       },
       {
-        "command": "quickEmojiTerminal",
-        "title": "Pick an emoji and insert in terminal"
+        "command": "emojisense.quickEmojiTerminal",
+        "title": "Pick an emoji and insert in terminal",
+        "category": "Emojisense"
       },
       {
-        "command": "quickEmojitextTerminal",
-        "title": "Pick an :emoji: and insert in terminal"
+        "command": "emojisense.quickEmojitextTerminal",
+        "title": "Pick an :emoji: and insert in terminal",
+        "category": "Emojisense"
       }
     ],
     "menus": {
       "commandPalette": [
         {
-          "command": "quickEmoji",
-          "when": "editorFocus"
+          "command": "emojisense.quickEmoji",
+          "when": "textInputFocus"
         },
         {
-          "command": "quickEmojitext",
-          "when": "editorFocus"
+          "command": "emojisense.quickEmojitext",
+          "when": "textInputFocus"
         },
         {
-          "command": "quickEmojiTerminal",
+          "command": "emojisense.quickEmojiTerminal",
           "when": "panelFocus && activeViewlet == 'workbench.panel.terminal'"
         },
         {
-          "command": "quickEmojitextTerminal",
+          "command": "emojisense.quickEmojitextTerminal",
           "when": "panelFocus && activeViewlet == 'workbench.panel.terminal'"
         }
       ]
     },
+    "keybindings": [
+      {
+        "mac": "cmd+[Period]",
+        "key": "ctrl+[Period]",
+        "command": "emojisense.quickEmojiTerminal",
+        "when": "inputFocus"
+      },
+      {
+        "mac": "shift+cmd+[Period]",
+        "key": "shift+ctrl+[Period]",
+        "command": "emojisense.quickEmojitextTerminal",
+        "when": "inputFocus"
+      },
+      {
+        "mac": "cmd+[Period]",
+        "key": "ctrl+[Period]",
+        "command": "emojisense.quickEmoji",
+        "when": "!terminalFocus"
+      },
+      {
+        "mac": "shift+cmd+[Period]",
+        "key": "shift+ctrl+[Period]",
+        "command": "emojisense.quickEmojitext",
+        "when": "!terminalFocus"
+      }
+    ],
     "configuration": {
       "title": ":emojisense:",
       "properties": {

@@ -28,19 +28,19 @@ export function activate(context: vscode.ExtensionContext) {
     const provider = new EmojiCompletionProvider(emoji, config)
 
     let providerSub = registerProviders(provider, config)
-
+vscode.window.showErrorMessage('loading')
     const emojiPicker = quickEmoji(emoji);
     context.subscriptions.push(
-        vscode.commands.registerCommand('quickEmoji', emojiPicker('emoji', 'editor'))
+        vscode.commands.registerCommand('emojisense.quickEmoji', emojiPicker('emoji', 'editor'))
     );
     context.subscriptions.push(
-        vscode.commands.registerCommand('quickEmojitext', emojiPicker('name', 'editor'))
+        vscode.commands.registerCommand('emojisense.quickEmojitext', emojiPicker('name', 'editor'))
     );
     context.subscriptions.push(
-        vscode.commands.registerCommand('quickEmojiTerminal', emojiPicker('emoji', 'terminal'))
+        vscode.commands.registerCommand('emojisense.quickEmojiTerminal', emojiPicker('emoji', 'terminal'))
     );
     context.subscriptions.push(
-        vscode.commands.registerCommand('quickEmojitextTerminal', emojiPicker('name', 'terminal'))
+        vscode.commands.registerCommand('emojisense.quickEmojitextTerminal', emojiPicker('name', 'terminal'))
     );
     vscode.workspace.onDidChangeConfiguration(() => {
         config.updateConfiguration()
