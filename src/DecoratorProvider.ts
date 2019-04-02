@@ -1,73 +1,73 @@
-import * as vscode from "vscode"
-import { EmojiProvider, Emoji } from './emoji'
-import Configuration from './configuration'
+import * as vscode from "vscode";
+import Configuration from './configuration';
+import { Emoji, EmojiProvider } from './emoji';
 
-const Datauri = require('datauri')
+const Datauri = require('datauri');
 
 export default class DecoratorProvider extends vscode.Disposable {
 
-    private readonly disposables: vscode.Disposable[] = []
+    private readonly disposables: vscode.Disposable[] = [];
 
-    private readonly decorationType: vscode.TextEditorDecorationType
+    private readonly decorationType: vscode.TextEditorDecorationType;
 
-    private activeEditor: vscode.TextEditor | undefined = undefined
+    private activeEditor: vscode.TextEditor | undefined = undefined;
     private timeout: any;
 
     constructor(
         private readonly emojiProvider: EmojiProvider,
-        private readonly config: Configuration
+        private readonly config: Configuration,
     ) {
-        super(() => this.dispose())
-        this.decorationType = vscode.window.createTextEditorDecorationType({})
+        super(() => this.dispose());
+        this.decorationType = vscode.window.createTextEditorDecorationType({});
 
-        this.activeEditor = vscode.window.activeTextEditor
-        this.setDecorators(this.activeEditor)
+        this.activeEditor = vscode.window.activeTextEditor;
+        this.setDecorators(this.activeEditor);
 
-        vscode.window.onDidChangeActiveTextEditor(editor => {
-            this.activeEditor = editor
+        vscode.window.onDidChangeActiveTextEditor((editor) => {
+            this.activeEditor = editor;
             if (editor) {
-                this.triggerUpdateDecorations()
+                this.triggerUpdateDecorations();
             }
-        }, this, this.disposables)
+        }, this, this.disposables);
 
         vscode.workspace.onDidChangeTextDocument((event: vscode.TextDocumentChangeEvent) => {
             if (this.activeEditor && event.document === this.activeEditor.document) {
                 this.triggerUpdateDecorations();
             }
-        }, this, this.disposables)
+        }, this, this.disposables);
     }
 
-    dispose() {
-        let d: vscode.Disposable | undefined = undefined
+    public dispose() {
+        let d: vscode.Disposable | undefined;
         while ((d = this.disposables.pop())) {
-            d.dispose()
+            d.dispose();
         }
     }
 
     private triggerUpdateDecorations(): void {
         if (this.timeout) {
-            return
+            return;
         }
         this.timeout = setTimeout(() => {
-            this.setDecorators(this.activeEditor)
-            this.timeout = null
-        }, 300)
+            this.setDecorators(this.activeEditor);
+            this.timeout = null;
+        }, 300);
     }
 
     private setDecorators(activeEditor: vscode.TextEditor | undefined) {
         if (!activeEditor || !this.config.isInlineEnabled(activeEditor.document.languageId)) {
-            return false
+            return false;
         }
 
         const regEx = /:([\w\d_\+\-]+?):/g;
         const text = activeEditor.document.getText();
         let match;
-        const d: vscode.DecorationOptions[] = []
+        const d: vscode.DecorationOptions[] = [];
         while (match = regEx.exec(text)) {
-            const name = match[1]
-            const emoji = this.emojiProvider.lookup(name)
+            const name = match[1];
+            const emoji = this.emojiProvider.lookup(name);
             if (!emoji) {
-                continue
+                continue;
             }
 
             const startPos = activeEditor.document.positionAt(match.index + 1);
@@ -79,17 +79,17 @@ export default class DecoratorProvider extends vscode.Disposable {
                     after: {
                         contentText: emoji.emoji,
                         margin: '0.2em',
-                        color: 'rgba(255, 255, 255, 0.55)'
-                    }
-                }
-            })
+                        color: 'rgba(255, 255, 255, 0.55)',
+                    },
+                },
+            });
         }
         activeEditor.setDecorations(this.decorationType, d);
     }
 
     private hoverMessage(emoji: Emoji): string {
-        const width = 160
-        const height = 160
+        const width = 160;
+        const height = 160;
         const datauri = new Datauri();
         const src = `<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
@@ -97,6 +97,6 @@ export default class DecoratorProvider extends vscode.Disposable {
      <text x="50%" y="50%" text-anchor="middle" alignment-baseline="central" font-size="120">${emoji.emoji}</text>
 </svg>`;
         datauri.format('.svg', src);
-        return `![](${datauri.content})`
+        return `![](${datauri.content})`;
     }
 }

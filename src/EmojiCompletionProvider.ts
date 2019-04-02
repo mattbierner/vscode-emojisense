@@ -1,74 +1,80 @@
-import { CompletionItem, TextDocument, Position, Range, CompletionItemKind, CompletionItemProvider, CancellationToken, ProviderResult, MarkdownString } from "vscode"
-import { EmojiProvider } from './emoji'
-import Configuration from './configuration'
+import * as vscode from "vscode";
+import Configuration from './configuration';
+import { EmojiProvider } from './emoji';
 
-export default class EmojiCompletionProvider implements CompletionItemProvider {
+export default class EmojiCompletionProvider implements vscode.CompletionItemProvider {
     constructor(
         private readonly emojiProvider: EmojiProvider,
-        private readonly configuration: Configuration
+        private readonly configuration: Configuration,
     ) { }
 
-    provideCompletionItems(
-        document: TextDocument,
-        position: Position,
-        _token: CancellationToken
-    ): ProviderResult<CompletionItem[]> {
+    public provideCompletionItems(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        _token: vscode.CancellationToken,
+    ): vscode.ProviderResult<vscode.CompletionItem[]> {
         if (position.character === 0) {
-            return []
+            return [];
         }
 
-        const line = document.lineAt(position.line)
-        const pre = line.text.slice(0, position.character)
+        const line = document.lineAt(position.line);
+        const pre = line.text.slice(0, position.character);
 
         // Handle case of: `:cat:|`
-        const preExistingMatch = pre.match(/:[\w\d_\+\-]+:$/)
+        const preExistingMatch = pre.match(/:[\w\d_\+\-]+:$/);
 
         // If there is a character before the colon, require at least one character after it
-        const preMatch = preExistingMatch || pre.match(/(?:\s|^)(:(:?)$)|(:(:?)[\w\d_\+\-]+?)$/)
+        const preMatch = preExistingMatch || pre.match(/(?:\s|^)(:(:?)$)|(:(:?)[\w\d_\+\-]+?)$/);
         if (!preMatch) {
-            return []
+            return [];
         }
 
-        const post = line.text.slice(position.character)
-        const postMatch = post.match(/[\w\d_\+\-]*?:?/)
+        const post = line.text.slice(position.character);
+        const postMatch = post.match(/[\w\d_\+\-]*?:?/);
 
-        const replacementSpan: Range = new Range(
+        const replacementSpan: vscode.Range = new vscode.Range(
             position.translate(0, -(preMatch[1] || preMatch[3] || '').length),
-            postMatch ? position.translate(0, postMatch[0].length) : position)
+            postMatch ? position.translate(0, postMatch[0].length) : position);
 
         if (pre.length >= 2 && (preMatch[2] || preMatch[4])) {
-            return this.getMarkupEmojiCompletions(document, replacementSpan)
+            return this.getMarkupEmojiCompletions(document, replacementSpan);
         }
 
         return this.getUnicodeEmojiCompletions(document, replacementSpan)
-            .concat(this.getMarkupEmojiCompletions(document, replacementSpan))
+            .concat(this.getMarkupEmojiCompletions(document, replacementSpan));
     }
 
-    private getUnicodeEmojiCompletions(document: TextDocument, replacementSpan: Range): CompletionItem[] {
+    private getUnicodeEmojiCompletions(
+        document: vscode.TextDocument,
+        replacementSpan: vscode.Range,
+    ): vscode.CompletionItem[] {
         if (!this.configuration.areUnicodeCompletionsEnabled(document.languageId)) {
-            return []
+            return [];
         }
-        return Array.from(this.emojiProvider.emojis).map(x => {
-            const item = new CompletionItem(`:${x.name}: ${x.emoji}`, CompletionItemKind.Text)
-            item.filterText = `:${x.name}:`
-            item.documentation = new MarkdownString(`# ${x.emoji}`)
-            item.insertText = x.emoji
-            item.range = replacementSpan
-            return item
-        })
+        return Array.from(this.emojiProvider.emojis).map((x) => {
+            const item = new vscode.CompletionItem(`:${x.name}: ${x.emoji}`, vscode.CompletionItemKind.Text);
+            item.filterText = `:${x.name}:`;
+            item.documentation = new vscode.MarkdownString(`# ${x.emoji}`);
+            item.insertText = x.emoji;
+            item.range = replacementSpan;
+            return item;
+        });
     }
 
-    private getMarkupEmojiCompletions(document: TextDocument, replacementSpan: Range): CompletionItem[] {
+    private getMarkupEmojiCompletions(
+        document: vscode.TextDocument,
+        replacementSpan: vscode.Range,
+    ): vscode.CompletionItem[] {
         if (!this.configuration.areMarkupCompletionsEnabled(document.languageId)) {
-            return []
+            return [];
         }
-        return Array.from(this.emojiProvider.emojis).map(x => {
-            const item = new CompletionItem(`::${x.name} ${x.emoji}`, CompletionItemKind.Text)
+        return Array.from(this.emojiProvider.emojis).map((x) => {
+            const item = new vscode.CompletionItem(`::${x.name} ${x.emoji}`, vscode.CompletionItemKind.Text);
             item.filterText = `::${x.name}`;
-            item.documentation = new MarkdownString(`# ${x.emoji}`)
-            item.insertText = `:${x.name}:`
-            item.range = replacementSpan
-            return item
-        })
+            item.documentation = new vscode.MarkdownString(`# ${x.emoji}`);
+            item.insertText = `:${x.name}:`;
+            item.range = replacementSpan;
+            return item;
+        });
     }
 }
