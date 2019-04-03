@@ -64,28 +64,28 @@
     },
     "keybindings": [
       {
-        "mac": "cmd+[Period]",
-        "key": "ctrl+[Period]",
+        "mac": "cmd+i",
+        "key": "ctrl+i",
         "command": "emojisense.quickEmojiTerminal",
-        "when": "inputFocus"
+        "when": "terminalFocus"
       },
       {
-        "mac": "shift+cmd+[Period]",
-        "key": "shift+ctrl+[Period]",
+        "mac": "shift+cmd+i",
+        "key": "shift+ctrl+i",
         "command": "emojisense.quickEmojitextTerminal",
-        "when": "inputFocus"
+        "when": "terminalFocus"
       },
       {
-        "mac": "cmd+[Period]",
-        "key": "ctrl+[Period]",
+        "mac": "cmd+i",
+        "key": "ctrl+i",
         "command": "emojisense.quickEmoji",
-        "when": "!terminalFocus"
+        "when": "editorTextFocus"
       },
       {
-        "mac": "shift+cmd+[Period]",
-        "key": "shift+ctrl+[Period]",
+        "mac": "shift+cmd+i",
+        "key": "shift+ctrl+i",
         "command": "emojisense.quickEmojitext",
-        "when": "!terminalFocus"
+        "when": "editorTextFocus"
       }
     ],
     "configuration": {

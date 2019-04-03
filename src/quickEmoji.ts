@@ -1,4 +1,4 @@
-import { Uri, window, Disposable, QuickPickItem, workspace, TextEdit } from 'vscode';
+import { Uri, window, Disposable, QuickPickItem, workspace, TextEdit, commands } from 'vscode';
 import { EmojiProvider, Emoji } from './emoji'
 
 export type EmojiDestination = 'terminal' | 'editor';
@@ -31,6 +31,7 @@ export const quickEmoji = (emoji: EmojiProvider) => {
 			const insert = property === 'name' ? `:${emoji.description}:` : emoji.label || '';
 			if (terminal && destination === 'terminal') {
 				terminal.sendText(insert, false);
+				await commands.executeCommand('workbench.action.terminal.focus');	
 			}
 			else if (editor && destination === 'editor') {
 				editor.edit(builder => builder.insert(editor.selection.active, insert));

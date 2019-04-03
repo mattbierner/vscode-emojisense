@@ -11,6 +11,10 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 - Enable and control emoji completion settings per language
 - See emoji previews of `:smile:` style markup inline
 - Provide an emoji picker to select and insert your emoji. (notably in the terminal) :wink:
+  You can access it through <kbd>Cmd+i</kbd> for the emoji icon and <kbd>Cmd+Shift+i</kbd> for the textual representation.
+  (think about "emoj **i**")
+  This will adapt to your context whether you're in the terminal on not.
+  (note that for windows&linux you should replace <kbd>Cmd</kbd> by<kbd>Ctrl</kbd> )
 
 [List of supported emoji][cheat]
 
