@@ -13,7 +13,7 @@
     "emoticons"
   ],
   "engines": {
-    "vscode": "^1.17.0"
+    "vscode": "^1.29.0"
   },
   "repository": {
     "url": "https://github.com/mattbierner/vscode-emojisense.git"
@@ -28,6 +28,66 @@
     "*"
   ],
   "contributes": {
+    "commands": [
+      {
+        "command": "emojisense.quickEmoji",
+        "title": "Pick an emoji and insert in editor",
+        "category": "Emojisense"
+      },
+      {
+        "command": "emojisense.quickEmojitext",
+        "title": "Pick an :emoji: and insert in editor",
+        "category": "Emojisense"
+      },
+      {
+        "command": "emojisense.quickEmojiTerminal",
+        "title": "Pick an emoji and insert in terminal",
+        "category": "Emojisense"
+      },
+      {
+        "command": "emojisense.quickEmojitextTerminal",
+        "title": "Pick an :emoji: and insert in terminal",
+        "category": "Emojisense"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "emojisense.quickEmojiTerminal",
+          "when": "panelFocus && activeViewlet == 'workbench.panel.terminal'"
+        },
+        {
+          "command": "emojisense.quickEmojitextTerminal",
+          "when": "panelFocus && activeViewlet == 'workbench.panel.terminal'"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "mac": "cmd+i",
+        "key": "ctrl+i",
+        "command": "emojisense.quickEmojiTerminal",
+        "when": "terminalFocus"
+      },
+      {
+        "mac": "shift+cmd+i",
+        "key": "shift+ctrl+i",
+        "command": "emojisense.quickEmojitextTerminal",
+        "when": "terminalFocus"
+      },
+      {
+        "mac": "cmd+i",
+        "key": "ctrl+i",
+        "command": "emojisense.quickEmoji",
+        "when": "editorTextFocus"
+      },
+      {
+        "mac": "shift+cmd+i",
+        "key": "shift+ctrl+i",
+        "command": "emojisense.quickEmojitext",
+        "when": "editorTextFocus"
+      }
+    ],
     "configuration": {
       "title": ":emojisense:",
       "properties": {
@@ -99,7 +159,7 @@
   "devDependencies": {
     "tslint": "^5.15.0",
     "typescript": "^2.9.2",
-    "vscode": "^1.0.0",
+    "vscode": "^1.1.29",
     "@types/node": "^10.3.3"
   },
   "dependencies": {
