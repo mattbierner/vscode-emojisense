@@ -139,6 +139,11 @@
                     "type": "boolean",
                     "description": "Enable completions that insert emoji markdown, i.e. ::smile_cat -> :smile_cat:",
                     "default": false
+                  },
+                  "emojiDecoratorsEnabled": {
+                    "type": "boolean",
+                    "description": "Enables or disables emoji decorators for emoji markup",
+                    "default": false
                   }
                 }
               }
