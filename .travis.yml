@@ -1,0 +1,20 @@
+branches:
+  only:
+  - master
+
+language: node_js
+
+sudo: false
+
+matrix:
+  include:
+    - os: linux
+    - os: mac
+    - os: windows
+
+install:
+  - npm install 
+
+script:
+  - npm run compile
+  - npm run lint
