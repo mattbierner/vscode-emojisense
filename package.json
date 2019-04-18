@@ -66,12 +66,14 @@
       {
         "mac": "cmd+i",
         "key": "ctrl+i",
+        "linux": "ctrl+alt+i",
         "command": "emojisense.quickEmojiTerminal",
         "when": "terminalFocus"
       },
       {
         "mac": "shift+cmd+i",
         "key": "shift+ctrl+i",
+        "linux": "shift+ctrl+alt+i",
         "command": "emojisense.quickEmojitextTerminal",
         "when": "terminalFocus"
       },
