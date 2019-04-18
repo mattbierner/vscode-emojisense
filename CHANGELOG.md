@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.5.1 - April 18, 2019
+- Set explicit `extensionKind` for VS Code compatability.
+- Use ctrl+alt+i as default linux keybinding.
+
 ## 0.4.1 - June 13, 2018
 - Update gemoji
 - Lowercase language keys
