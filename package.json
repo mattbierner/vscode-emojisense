@@ -34,7 +34,7 @@
         "emojisense.enableEmojisInAllLanguages": {
           "type": "boolean",
           "description": "Lets you easily enable emoji decorators in ALL languages",
-          "default": true
+          "default": false
         },
         "emojisense.unicodeCompletionsEnabled": {
           "type": "boolean",

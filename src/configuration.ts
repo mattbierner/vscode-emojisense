@@ -15,7 +15,7 @@ export default class Configuration implements LanguageConfig {
     markupCompletionsEnabled: boolean = true
     showOnColon: boolean = true
     emojiDecoratorsEnabled: boolean = true
-    enableEmojisInAllLanguages: boolean = true
+    enableEmojisInAllLanguages: boolean = false
 
     constructor() {
         this.updateConfiguration()
@@ -64,7 +64,7 @@ export default class Configuration implements LanguageConfig {
         this.markupCompletionsEnabled = config.get<boolean>('markupCompletionsEnabled', true)
         this.showOnColon = config.get<boolean>('showOnColon', true)
         this.emojiDecoratorsEnabled = config.get<boolean>('emojiDecoratorsEnabled', true)
-        this.enableEmojisInAllLanguages = config.get<boolean>("enableEmojisInAllLanguages", true);
+        this.enableEmojisInAllLanguages = config.get<boolean>("enableEmojisInAllLanguages", false);
 
         this.languageConfigurations = new Map()
         const languagesConfig = config.get<any>('languages', {})
