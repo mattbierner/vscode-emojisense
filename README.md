@@ -1,6 +1,6 @@
 Adds suggestions and autocomplete for emoji to VS Code.
 
-![Example](/media/example.gif?raw=true)
+![Example](https://raw.githubusercontent.com/mattbierner/vscode-emojisense/master/media/example.gif)
 
 Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 
