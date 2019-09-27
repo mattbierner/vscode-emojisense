@@ -1,7 +1,10 @@
 # Change Log
 
+## 0.5.2 - September 27, 2019
+- Webpack extension. Thanks @usernamehw!
+
 ## 0.5.1 - April 18, 2019
-- Set explicit `extensionKind` for VS Code compatability.
+- Set explicit `extensionKind` for VS Code compatibility.
 - Use ctrl+alt+i as default linux keybinding.
 
 ## 0.4.1 - June 13, 2018
@@ -22,11 +25,11 @@
 * Increase opacity of inline emoji preview to work better across a range of themes.
 
 ## 0.2.1 - May 13, 2017
-* Fix wrong datauri package listed in package.json
+* Fix wrong `datauri` package listed in `package.json`
 
 ## 0.2.0 - May 13, 2017
 * Continue tweaking when emojis are shown.
-* Added support for showing emoji decorators inline for `:rocket:` sytax. Can also view large previews of the emojis by hovering
+* Added support for showing emoji decorators inline for `:rocket:` syntax. Can also view large previews of the emojis by hovering
 
 ## 0.1.0 - May 12, 2017
 - Tweak when completions are shown to not get in the way as much. They will no longer show when the colon is prefixed by a letter such as: `a:|`. In these cases, there must also be a letter after the colon before we show suggestions: `a:b|`
