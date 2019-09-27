@@ -9,3 +9,6 @@ tsconfig.json
 vsc-extension-quickstart.md
 node_modules
 webpack.config.js
+media/example.gif
+tslint.json
+LICENSE
