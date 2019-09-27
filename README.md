@@ -11,9 +11,9 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 - Enable and control emoji completion settings per language
 - See emoji previews of `:smile:` style markup inline
 - Provide an emoji picker to select and insert an emoji in the editor or terminal. To access the picker, run the `Emojisense: Pick an emoji` command, or use the default keybindings:
-    - Mac: <kbd>cmd</kbd><kbd>i</kbd>
-    - Linux: <kbd>ctrl</kbd><kbd>alrt</kbd><kbd>i</kbd>
-    - Windows: <kbd>ctrl</kbd><kbd>i</kbd>
+    - Mac: <kbd>cmd</kbd> + <kbd>i</kbd>
+    - Linux: <kbd>ctrl</kbd> + <kbd>alt</kbd> + <kbd>i</kbd>
+    - Windows: <kbd>ctrl</kbd> + <kbd>i</kbd>
 
 [List of supported emoji][cheat]
 
