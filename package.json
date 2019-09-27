@@ -156,20 +156,23 @@
       }
     }
   },
-  "main": "./out/extension",
+  "main": "./dist/extension",
   "scripts": {
-    "compile": "tsc -p ./",
+    "compile": "webpack --mode production",
     "lint": "tslint -p tsconfig.json",
-    "vscode:prepublish": "tsc -p ./"
+    "vscode:prepublish": "webpack --mode production"
   },
   "devDependencies": {
+    "@types/node": "^10.3.3",
+    "@types/vscode": "^1.29.0",
+    "ts-loader": "^6.1.2",
     "tslint": "^5.15.0",
     "typescript": "^3.4.1",
-    "@types/vscode": "^1.33.0",
-    "@types/node": "^10.3.3"
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9"
   },
   "dependencies": {
-    "datauri": "^1.1.0",
+    "datauri": "^2.0.0",
     "gemoji": "^4.2.1"
   }
 }
