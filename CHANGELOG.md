@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.5.3 - September 27, 2019
+- Remove `out` dir from published extension.
+
 ## 0.5.2 - September 27, 2019
 - Webpack extension. Thanks @usernamehw!
 
