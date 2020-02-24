@@ -96,12 +96,12 @@
       "properties": {
         "emojisense.unicodeCompletionsEnabled": {
           "type": "boolean",
-          "description": "Enable completions that insert emoji as unicode, i.e. :smile_cat: -> 😸",
+          "markdownDescription": "Enable completions that insert emoji as unicode, i.e. `:smile_cat:` -> 😸",
           "default": true
         },
         "emojisense.markupCompletionsEnabled": {
           "type": "boolean",
-          "description": "Enable completions that insert emoji markup, i.e. ::smile_cat -> :smile_cat:",
+          "markdownDescription": "Enable completions that insert emoji markup, i.e. `::smile_cat` -> `:smile_cat:`",
           "default": true
         },
         "emojisense.showOnColon": {
@@ -111,7 +111,7 @@
         },
         "emojisense.emojiDecoratorsEnabled": {
           "type": "boolean",
-          "description": "Enables or disables emoji decorators for emoji markup",
+          "description": "Enables or disables emoji decorators for emoji markup.",
           "default": true
         },
         "emojisense.languages": {
