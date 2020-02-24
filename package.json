@@ -6,7 +6,7 @@
   "publisher": "bierner",
   "icon": "media/icon.png",
   "license": "MIT",
-  "extensionKind": "ui",
+  "extensionKind": ["ui", "workspace"],
   "keywords": [
     "emoji",
     "emojis",
