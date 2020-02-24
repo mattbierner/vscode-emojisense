@@ -11,11 +11,8 @@ function registerProviders(
 ): vscode.Disposable {
     const disposables: vscode.Disposable[] = [];
     for (const language of config.languages) {
-        if (config.shouldShowOnColon(language)) {
-            disposables.push(vscode.languages.registerCompletionItemProvider(language, provider, ':'));
-        } else {
-            disposables.push(vscode.languages.registerCompletionItemProvider(language, provider));
-        }
+        const triggerCharacters = config.shouldShowOnColon(language) ? [':'] : []; 
+        disposables.push(vscode.languages.registerCompletionItemProvider(language, provider, ...triggerCharacters));
     }
 
     return vscode.Disposable.from(...disposables);
