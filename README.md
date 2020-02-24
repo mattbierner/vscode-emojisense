@@ -32,11 +32,12 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 
 *Emojisense* is enabled by default in markdown, git commits, and plaintext files. You can enable it in other languages using `"emojisense.languages"`
 
-```json
+```jsonc
 "emojisense.languages": {
     "markdown": true,
     "plaintext": false,
-    "json": true
+    "json": true,
+    "@scm/commit": true // pseudo language id used for scm input
 }
 ```
 
@@ -44,14 +45,14 @@ The language keys here come from [VS Code's list of language identifiers](https:
 
 You can also change the settings for each language. Here's the default emojisense configuration for example:
 
-```json
+```jsonc
 "emojisense.languages": {
     "markdown": true,
     "plaintext": {
         "markupCompletionsEnabled": false,
         "emojiDecoratorsEnabled": false
     },
-    "git-commit": true
+    "@scm/commit": true // pseudo language id used for scm input
 }
 ```
 

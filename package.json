@@ -126,6 +126,7 @@
               "markupCompletionsEnabled": false,
               "emojiDecoratorsEnabled": false
             },
+            "@scm/commit": true,
             "git-commit": true
           },
           "additionalProperties": {

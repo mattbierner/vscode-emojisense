@@ -1,6 +1,12 @@
 import * as vscode from 'vscode';
 
-export const scmInputSelector = Object.freeze<vscode.DocumentFilter>({ scheme: 'vscode', pattern: 'scm/**/input' });
+export const scmPseudoLanguageId = '@scm/commit';
+
+export const scmInputSelector = Object.freeze<vscode.DocumentFilter>({
+    scheme: 'vscode',
+    pattern: 'scm/**/input',
+    language: 'plaintext',
+});
 
 export function isScmInputDocument(document: vscode.TextDocument): boolean {
     return vscode.languages.match(scmInputSelector, document) > 0;
@@ -29,12 +35,12 @@ export class Configuration implements LanguageConfig {
         this.updateConfiguration();
     }
 
-    public areUnicodeCompletionsEnabled(forLanguage: string): boolean {
-        return this.is('unicodeCompletionsEnabled', forLanguage);
+    public areUnicodeCompletionsEnabled(document: vscode.TextDocument): boolean {
+        return this.is('unicodeCompletionsEnabled', this.getLanguageId(document));
     }
 
-    public areMarkupCompletionsEnabled(forLanguage: string): boolean {
-        return this.is('markupCompletionsEnabled', forLanguage);
+    public areMarkupCompletionsEnabled(document: vscode.TextDocument): boolean {
+        return this.is('markupCompletionsEnabled', this.getLanguageId(document));
     }
 
     public shouldShowOnColon(forLanguage: string): boolean {
@@ -65,6 +71,10 @@ export class Configuration implements LanguageConfig {
                 this.languageConfigurations.set(languageName, configValue);
             }
         }
+    }
+
+    private getLanguageId(document: vscode.TextDocument): string {
+        return isScmInputDocument(document) ? scmPseudoLanguageId : document.languageId;
     }
 
     private is(setting: keyof LanguageConfig, forLanguage: string): boolean {

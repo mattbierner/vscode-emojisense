@@ -48,7 +48,7 @@ export default class EmojiCompletionProvider implements vscode.CompletionItemPro
         document: vscode.TextDocument,
         replacementSpan: vscode.Range,
     ): vscode.CompletionItem[] {
-        if (!this.configuration.areUnicodeCompletionsEnabled(document.languageId)) {
+        if (!this.configuration.areUnicodeCompletionsEnabled(document)) {
             return [];
         }
 
@@ -67,7 +67,7 @@ export default class EmojiCompletionProvider implements vscode.CompletionItemPro
         document: vscode.TextDocument,
         replacementSpan: vscode.Range,
     ): vscode.CompletionItem[] {
-        if (!this.configuration.areMarkupCompletionsEnabled(document.languageId)) {
+        if (!this.configuration.areMarkupCompletionsEnabled(document)) {
             return [];
         }
 
