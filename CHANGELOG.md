@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.6.1 - Feb 24, 2020
+- Add pseudo language for scm input instead of sharing config with `plaintext`.
+
 ## 0.6.0 - Feb 24, 2020
 - Enable in SCM (git) input.
 
