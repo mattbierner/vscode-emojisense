@@ -1,5 +1,11 @@
 import * as vscode from 'vscode';
 
+export const scmInputSelector = Object.freeze<vscode.DocumentFilter>({ scheme: 'vscode', pattern: 'scm/**/input' });
+
+export function isScmInputDocument(document: vscode.TextDocument): boolean {
+    return vscode.languages.match(scmInputSelector, document) > 0;
+}
+
 interface LanguageConfig {
     readonly unicodeCompletionsEnabled?: boolean;
     readonly markupCompletionsEnabled?: boolean;
@@ -7,7 +13,7 @@ interface LanguageConfig {
     readonly emojiDecoratorsEnabled?: boolean;
 }
 
-export default class Configuration implements LanguageConfig {
+export class Configuration implements LanguageConfig {
 
     public get languages(): Iterable<string> {
         return this.languageConfigurations.keys();

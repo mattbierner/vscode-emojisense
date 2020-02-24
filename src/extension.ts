@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import Configuration from './configuration';
+import { Configuration, scmInputSelector } from './configuration';
 import DecoratorProvider from "./DecoratorProvider";
 import { EmojiProvider } from './emoji';
 import EmojiCompletionProvider from './EmojiCompletionProvider';
@@ -10,9 +10,17 @@ function registerProviders(
     config: Configuration,
 ): vscode.Disposable {
     const disposables: vscode.Disposable[] = [];
+
+    let enabledForPlainText = false;
     for (const language of config.languages) {
-        const triggerCharacters = config.shouldShowOnColon(language) ? [':'] : []; 
+        enabledForPlainText = enabledForPlainText || language === 'plaintext';
+        const triggerCharacters = config.shouldShowOnColon(language) ? [':'] : [];
         disposables.push(vscode.languages.registerCompletionItemProvider(language, provider, ...triggerCharacters));
+    }
+
+    if (!enabledForPlainText) {
+        const triggerCharacters = config.showOnColon ? [':'] : [];
+        disposables.push(vscode.languages.registerCompletionItemProvider(scmInputSelector, provider, ...triggerCharacters));
     }
 
     return vscode.Disposable.from(...disposables);

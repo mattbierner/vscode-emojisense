@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import Configuration from './configuration';
+import { Configuration } from './configuration';
 import { Emoji, EmojiProvider } from './emoji';
 
 const Datauri = require('datauri');

@@ -10,6 +10,7 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 - Insert emoji markup by typing `::`
 - Enable and control emoji completion settings per language
 - See emoji previews of `:smile:` style markup inline
+- Can be enabled in VS Code's SCM (git) input box.
 - Provide an emoji picker to select and insert an emoji in the editor or terminal. To access the picker, run the `Emojisense: Pick an emoji` command, or use the default keybindings:
     - Mac: <kbd>cmd</kbd> + <kbd>i</kbd>
     - Linux: <kbd>ctrl</kbd> + <kbd>alt</kbd> + <kbd>i</kbd>
@@ -34,7 +35,6 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 ```json
 "emojisense.languages": {
     "markdown": true,
-    "git-commit": false,
     "plaintext": false,
     "json": true
 }

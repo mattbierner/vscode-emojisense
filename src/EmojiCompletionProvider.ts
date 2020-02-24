@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import Configuration from './configuration';
+import { Configuration, isScmInputDocument } from './configuration';
 import { EmojiProvider } from './emoji';
 
 export default class EmojiCompletionProvider implements vscode.CompletionItemProvider {
@@ -51,7 +51,10 @@ export default class EmojiCompletionProvider implements vscode.CompletionItemPro
         if (!this.configuration.areUnicodeCompletionsEnabled(document.languageId)) {
             return [];
         }
+
+        const kind = this.getCompletionKind(document);
         return this.emojiProvider.emojis.map((x) => {
+            const item = new vscode.CompletionItem(`:${x.name}: ${x.emoji}`, kind);
             item.filterText = `:${x.name}:`;
             item.documentation = new vscode.MarkdownString(`# ${x.emoji}`);
             item.insertText = x.emoji;
@@ -67,13 +70,20 @@ export default class EmojiCompletionProvider implements vscode.CompletionItemPro
         if (!this.configuration.areMarkupCompletionsEnabled(document.languageId)) {
             return [];
         }
+
+        const kind = this.getCompletionKind(document);
         return this.emojiProvider.emojis.map((x) => {
-            const item = new vscode.CompletionItem(`::${x.name} ${x.emoji}`, vscode.CompletionItemKind.Text);
+            const item = new vscode.CompletionItem(`::${x.name} ${x.emoji}`, kind);
             item.filterText = `::${x.name}`;
             item.documentation = new vscode.MarkdownString(`# ${x.emoji}`);
             item.insertText = `:${x.name}:`;
             item.range = replacementSpan;
             return item;
         });
+    }
+
+    private getCompletionKind(document: vscode.TextDocument) {
+        // Text completions are disable dy default in scm inputs
+        return isScmInputDocument(document) ? undefined : vscode.CompletionItemKind.Text;
     }
 }
