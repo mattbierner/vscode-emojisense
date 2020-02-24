@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.6.0 - Feb 24, 2020
+- Enable in SCM (git) input.
+
 ## 0.5.3 - September 27, 2019
 - Remove `out` dir from published extension.
 

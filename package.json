@@ -2,11 +2,14 @@
   "name": "emojisense",
   "displayName": ":emojisense:",
   "description": "Adds suggestions and autocomplete for emoji",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "publisher": "bierner",
   "icon": "media/icon.png",
   "license": "MIT",
-  "extensionKind": ["ui", "workspace"],
+  "extensionKind": [
+    "ui",
+    "workspace"
+  ],
   "keywords": [
     "emoji",
     "emojis",
