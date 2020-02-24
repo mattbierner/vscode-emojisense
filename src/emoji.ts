@@ -4,10 +4,14 @@ export interface Emoji {
 }
 
 export class EmojiProvider {
-    private _emojiMap: Map<string, Emoji> | null = null;
+    private _emojiMap?: Map<string, Emoji>;
+    private _emojis?: ReadonlyArray<Emoji>;
 
-    public get emojis(): Iterable<Emoji> {
-        return this.emojiMap.values();
+    public get emojis(): ReadonlyArray<Emoji> {
+        if (!this._emojis) {
+            this._emojis = Array.from(this.emojiMap.values());
+        }
+        return this._emojis;
     }
 
     public lookup(name: string): Emoji | undefined {

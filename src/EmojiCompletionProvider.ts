@@ -51,8 +51,7 @@ export default class EmojiCompletionProvider implements vscode.CompletionItemPro
         if (!this.configuration.areUnicodeCompletionsEnabled(document.languageId)) {
             return [];
         }
-        return Array.from(this.emojiProvider.emojis).map((x) => {
-            const item = new vscode.CompletionItem(`:${x.name}: ${x.emoji}`, vscode.CompletionItemKind.Text);
+        return this.emojiProvider.emojis.map((x) => {
             item.filterText = `:${x.name}:`;
             item.documentation = new vscode.MarkdownString(`# ${x.emoji}`);
             item.insertText = x.emoji;
@@ -68,7 +67,7 @@ export default class EmojiCompletionProvider implements vscode.CompletionItemPro
         if (!this.configuration.areMarkupCompletionsEnabled(document.languageId)) {
             return [];
         }
-        return Array.from(this.emojiProvider.emojis).map((x) => {
+        return this.emojiProvider.emojis.map((x) => {
             const item = new vscode.CompletionItem(`::${x.name} ${x.emoji}`, vscode.CompletionItemKind.Text);
             item.filterText = `::${x.name}`;
             item.documentation = new vscode.MarkdownString(`# ${x.emoji}`);

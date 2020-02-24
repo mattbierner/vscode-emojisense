@@ -3,7 +3,7 @@ import { Emoji, EmojiProvider } from './emoji';
 
 export type EmojiDestination = 'terminal' | 'editor';
 export const quickEmoji = (provider: EmojiProvider) => {
-    const items: QuickPickItem[] = Array.from(provider.emojis).map((emoji) => {
+    const items: QuickPickItem[] = provider.emojis.map((emoji) => {
         return ({ description: emoji.name, label: emoji.emoji });
     });
 
