@@ -1,5 +1,5 @@
-import * as vscode from "vscode";
-import { Configuration, isScmInputDocument } from './configuration';
+import * as vscode from 'vscode';
+import { Configuration } from './configuration';
 import { EmojiProvider } from './emoji';
 
 export default class EmojiCompletionProvider implements vscode.CompletionItemProvider {
@@ -52,7 +52,7 @@ export default class EmojiCompletionProvider implements vscode.CompletionItemPro
             return [];
         }
 
-        const kind = this.getCompletionKind(document);
+        const kind = vscode.CompletionItemKind.Text;
         return this.emojiProvider.emojis.map((x) => {
             const item = new vscode.CompletionItem(`:${x.name}: ${x.emoji}`, kind);
             item.filterText = `:${x.name}:`;
@@ -71,7 +71,7 @@ export default class EmojiCompletionProvider implements vscode.CompletionItemPro
             return [];
         }
 
-        const kind = this.getCompletionKind(document);
+        const kind = vscode.CompletionItemKind.Text;
         return this.emojiProvider.emojis.map((x) => {
             const item = new vscode.CompletionItem(`::${x.name} ${x.emoji}`, kind);
             item.filterText = `::${x.name}`;
@@ -80,10 +80,5 @@ export default class EmojiCompletionProvider implements vscode.CompletionItemPro
             item.range = replacementSpan;
             return item;
         });
-    }
-
-    private getCompletionKind(document: vscode.TextDocument) {
-        // Text completions are disable dy default in scm inputs
-        return isScmInputDocument(document) ? undefined : vscode.CompletionItemKind.Text;
     }
 }

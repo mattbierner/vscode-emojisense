@@ -37,7 +37,7 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
     "markdown": true,
     "plaintext": false,
     "json": true,
-    "@scm/commit": true // pseudo language id used for scm input
+    "scminput": true // language used in the source control commit message box
 }
 ```
 
@@ -52,7 +52,7 @@ You can also change the settings for each language. Here's the default emojisens
         "markupCompletionsEnabled": false,
         "emojiDecoratorsEnabled": false
     },
-    "@scm/commit": true // pseudo language id used for scm input
+    "scminput": true // language used in the source control commit message box
 }
 ```
 
