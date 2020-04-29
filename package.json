@@ -17,7 +17,7 @@
     "emoticons"
   ],
   "engines": {
-    "vscode": "^1.29.0"
+    "vscode": "^1.45.0"
   },
   "repository": {
     "url": "https://github.com/mattbierner/vscode-emojisense.git"
@@ -126,7 +126,7 @@
               "markupCompletionsEnabled": false,
               "emojiDecoratorsEnabled": false
             },
-            "@scm/commit": true,
+            "scminput": true,
             "git-commit": true
           },
           "additionalProperties": {
