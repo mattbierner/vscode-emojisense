@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.7.0 - April 29, 2020
+- For VS Code 1.45+, use `scminput` to identify commit message input instead of pseudo language id.
+- Mark scm completions as plaintext.
+
 ## 0.6.1 - Feb 24, 2020
 - Add pseudo language for scm input instead of sharing config with `plaintext`.
 
