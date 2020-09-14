@@ -177,7 +177,7 @@
     "webpack-cli": "^3.3.9"
   },
   "dependencies": {
-    "datauri": "^2.0.0",
+    "datauri": "^3.0.0",
     "gemoji": "^4.2.1"
   }
 }
