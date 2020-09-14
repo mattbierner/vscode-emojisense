@@ -20,13 +20,12 @@ export class EmojiProvider {
 
     private get emojiMap(): Map<string, Emoji> {
         if (!this._emojiMap) {
-            const gemoji = require('gemoji');
+            const gemojies = require('gemoji');
             this._emojiMap = new Map<string, Emoji>();
-            for (const key of Object.keys(gemoji.name)) {
-                const entry = gemoji.name[key];
-                for (const name of entry.names) {
+            for (const gemoji of gemojies) {
+                for (const name of gemoji.names) {
                     if (!this._emojiMap.has(name)) {
-                        this._emojiMap.set(name, { name, emoji: entry.emoji });
+                        this._emojiMap.set(name, { name, emoji: gemoji.emoji });
                     }
                 }
             }

@@ -178,6 +178,6 @@
   },
   "dependencies": {
     "datauri": "^3.0.0",
-    "gemoji": "^4.2.1"
+    "gemoji": "^5.0.1"
   }
 }
