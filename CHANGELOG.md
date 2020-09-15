@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.8.0 - September 15, 2020
+- Update gemoji package. Thanks @AdrieanKhisbe!
+
 ## 0.7.0 - April 29, 2020
 - For VS Code 1.45+, use `scminput` to identify commit message input instead of pseudo language id.
 - Mark scm completions as plaintext.
