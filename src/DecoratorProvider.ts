@@ -2,7 +2,8 @@ import * as vscode from "vscode";
 import { Configuration } from './configuration';
 import { Emoji, EmojiProvider } from './emoji';
 
-const Datauri = require('datauri');
+const DatauriParser = require('datauri/parser');
+const parser = new DatauriParser();
 
 export default class DecoratorProvider extends vscode.Disposable {
 
@@ -90,13 +91,12 @@ export default class DecoratorProvider extends vscode.Disposable {
     private hoverMessage(emoji: Emoji): string {
         const width = 160;
         const height = 160;
-        const datauri = new Datauri();
         const src = `<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="${width}px" height="${height}px" viewBox="0 0 ${width} ${height}" xml:space="preserve">
      <text x="50%" y="50%" text-anchor="middle" alignment-baseline="central" font-size="120">${emoji.emoji}</text>
 </svg>`;
-        datauri.format('.svg', src);
-        return `![](${datauri.content})`;
+        const content = parser.format('.svg', src);
+        return `![](${content})`;
     }
 }
