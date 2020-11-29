@@ -10,7 +10,7 @@ export const quickEmoji = (provider: EmojiProvider) => {
     return (property: keyof Emoji, destination: EmojiDestination) => {
         return async () => {
 
-            const emoji: QuickPickItem | undefined = await new Promise<QuickPickItem>((resolve) => {
+            const emoji: QuickPickItem | undefined = await new Promise<QuickPickItem | undefined>((resolve) => {
                 const picker = window.createQuickPick<QuickPickItem>();
                 picker.items = items;
                 picker.matchOnDescription = true;
