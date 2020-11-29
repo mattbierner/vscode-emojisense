@@ -32,12 +32,19 @@ export const quickEmoji = (provider: EmojiProvider) => {
             }
 
             const insert = property === 'name' ? `:${emoji.description}:` : emoji.label || '';
-            if (window.activeTerminal && destination === 'terminal') {
-                window.activeTerminal.sendText(insert, false);
-                await commands.executeCommand('workbench.action.terminal.focus');
-            } else if (window.activeTextEditor && destination === 'editor') {
-                const editor = window.activeTextEditor;
-                await editor.edit((builder) => builder.insert(editor.selection.active, insert));
+            switch (destination) {
+                case 'terminal':
+                    if (window.activeTerminal) {
+                        window.activeTerminal.sendText(insert, false);
+                        await commands.executeCommand('workbench.action.terminal.focus');
+                    }
+                    break;
+                case 'editor':
+                    if (window.activeTextEditor) {
+                        const editor = window.activeTextEditor;
+                        await editor.edit((builder) => builder.insert(editor.selection.active, insert));
+                    }
+                    break;
             }
         };
     };
