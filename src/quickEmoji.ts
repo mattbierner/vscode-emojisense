@@ -2,6 +2,7 @@ import { commands, QuickPickItem, window } from 'vscode';
 import { Emoji, EmojiProvider } from './emoji';
 
 export type EmojiDestination = 'terminal' | 'editor';
+
 export const quickEmoji = (provider: EmojiProvider) => {
     const items: QuickPickItem[] = provider.emojis.map((emoji) => {
         return ({ description: emoji.name, label: emoji.emoji });
@@ -36,7 +37,7 @@ export const quickEmoji = (provider: EmojiProvider) => {
                 await commands.executeCommand('workbench.action.terminal.focus');
             } else if (window.activeTextEditor && destination === 'editor') {
                 const editor = window.activeTextEditor;
-                editor.edit((builder) => builder.insert(editor.selection.active, insert));
+                await editor.edit((builder) => builder.insert(editor.selection.active, insert));
             }
         };
     };
