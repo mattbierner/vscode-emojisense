@@ -21,16 +21,16 @@ export default class EmojiCompletionProvider implements vscode.CompletionItemPro
         const pre = line.text.slice(0, position.character);
 
         // Handle case of: `:cat:|`
-        const preExistingMatch = pre.match(/:[\w\d_\+\-]+:$/);
+        const preExistingMatch = pre.match(/:[\w\d_+-]+:$/);
 
         // If there is a character before the colon, require at least one character after it
-        const preMatch = preExistingMatch || pre.match(/(?:\s|^)(:(:?)$)|(:(:?)[\w\d_\+\-]+?)$/);
+        const preMatch = preExistingMatch || pre.match(/(?:\s|^)(:(:?)$)|(:(:?)[\w\d_+-]+?)$/);
         if (!preMatch) {
             return [];
         }
 
         const post = line.text.slice(position.character);
-        const postMatch = post.match(/[\w\d_\+\-]*?:?/);
+        const postMatch = post.match(/[\w\d_+-]*?:?/);
 
         const replacementSpan: vscode.Range = new vscode.Range(
             position.translate(0, -(preMatch[1] || preMatch[3] || '').length),

@@ -20,6 +20,7 @@ export class EmojiProvider {
 
     private get emojiMap(): Map<string, Emoji> {
         if (!this._emojiMap) {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
             const gemojies = require('gemoji');
             this._emojiMap = new Map<string, Emoji>();
             for (const gemoji of gemojies) {

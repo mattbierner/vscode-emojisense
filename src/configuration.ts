@@ -13,10 +13,10 @@ export class Configuration implements LanguageConfig {
         return this.languageConfigurations.keys();
     }
 
-    public unicodeCompletionsEnabled: boolean = true;
-    public markupCompletionsEnabled: boolean = true;
-    public showOnColon: boolean = true;
-    public emojiDecoratorsEnabled: boolean = true;
+    public unicodeCompletionsEnabled = true;
+    public markupCompletionsEnabled = true;
+    public showOnColon = true;
+    public emojiDecoratorsEnabled = true;
     private languageConfigurations = new Map<string, LanguageConfig>();
 
     constructor() {

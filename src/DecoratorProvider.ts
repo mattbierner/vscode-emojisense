@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { Configuration } from './configuration';
 import { Emoji, EmojiProvider } from './emoji';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const DatauriParser = require('datauri/parser');
 const parser = new DatauriParser();
 
@@ -60,11 +61,11 @@ export default class DecoratorProvider extends vscode.Disposable {
             return false;
         }
 
-        const regEx = /:([\w\d_\+\-]+?):/g;
+        const regEx = /:([\w\d_+-]+?):/g;
         const text = activeEditor.document.getText();
         let match;
         const d: vscode.DecorationOptions[] = [];
-        while (match = regEx.exec(text)) {
+        while ((match = regEx.exec(text))) {
             const name = match[1];
             const emoji = this.emojiProvider.lookup(name);
             if (!emoji) {
