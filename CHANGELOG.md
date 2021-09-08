@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.9.0 - September 7, 2021
+- Update gemoji package.
+- Add support for running in web environments
+
 ## 0.8.0 - September 15, 2020
 - Update gemoji package. Thanks @AdrieanKhisbe!
 
