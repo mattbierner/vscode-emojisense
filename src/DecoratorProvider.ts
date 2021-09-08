@@ -1,10 +1,9 @@
 import * as vscode from "vscode";
 import { Configuration } from './configuration';
 import { Emoji, EmojiProvider } from './emoji';
+import DataURIParser from 'datauri/parser';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const DatauriParser = require('datauri/parser');
-const parser = new DatauriParser();
+const parser = new DataURIParser();
 
 export default class DecoratorProvider extends vscode.Disposable {
 
@@ -97,7 +96,7 @@ export default class DecoratorProvider extends vscode.Disposable {
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="${width}px" height="${height}px" viewBox="0 0 ${width} ${height}" xml:space="preserve">
      <text x="50%" y="50%" text-anchor="middle" alignment-baseline="central" font-size="120">${emoji.emoji}</text>
 </svg>`;
-        const content = parser.format('.svg', src);
+        const { content } = parser.format('.svg', src);
         return `![](${content})`;
     }
 }
