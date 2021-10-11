@@ -40,8 +40,7 @@ export default class EmojiCompletionProvider implements vscode.CompletionItemPro
             return this.getMarkupEmojiCompletions(document, replacementSpan);
         }
 
-        return this.getUnicodeEmojiCompletions(document, replacementSpan)
-            .concat(this.getMarkupEmojiCompletions(document, replacementSpan));
+        return this.getUnicodeEmojiCompletions(document, replacementSpan);
     }
 
     private getUnicodeEmojiCompletions(
@@ -54,9 +53,15 @@ export default class EmojiCompletionProvider implements vscode.CompletionItemPro
 
         const kind = vscode.CompletionItemKind.Text;
         return this.emojiProvider.emojis.map((x) => {
-            const item = new vscode.CompletionItem(`:${x.name}: ${x.emoji}`, kind);
-            item.filterText = `:${x.name}:`;
-            item.documentation = new vscode.MarkdownString(`# ${x.emoji}`);
+            const item = new vscode.CompletionItem({
+                label: `:${x.name}: ${x.emoji}`,
+                description: x.tags.join(', '),
+            }, kind);
+            item.filterText = `:${x.tags.join(' ')} ${x.name} ${x.description} ${x.category}:`;
+            item.documentation = new vscode.MarkdownString([
+                `# ${x.emoji}`,
+                `_${x.category}: ${x.tags.concat(x.description).join(', ')}_`,
+            ].join('\n'));
             item.insertText = x.emoji;
             item.range = replacementSpan;
             return item;
@@ -73,9 +78,15 @@ export default class EmojiCompletionProvider implements vscode.CompletionItemPro
 
         const kind = vscode.CompletionItemKind.Text;
         return this.emojiProvider.emojis.map((x) => {
-            const item = new vscode.CompletionItem(`::${x.name} ${x.emoji}`, kind);
-            item.filterText = `::${x.name}`;
-            item.documentation = new vscode.MarkdownString(`# ${x.emoji}`);
+            const item = new vscode.CompletionItem({
+                label: `::${x.name} ${x.emoji}`,
+                description: x.tags.join(',  ')
+            }, kind);
+            item.filterText = `::${x.tags.join(' ')} ${x.name} ${x.description} ${x.category}`;
+            item.documentation = new vscode.MarkdownString([
+                `# ${x.emoji}`,
+                `_${x.category}: ${x.tags.concat(x.description).join(', ')}_`,
+            ].join('\n'));
             item.insertText = `:${x.name}:`;
             item.range = replacementSpan;
             return item;
