@@ -57,7 +57,7 @@ export default class EmojiCompletionProvider implements vscode.CompletionItemPro
                 label: `:${x.name}: ${x.emoji}`,
                 description: x.tags.join(', '),
             }, kind);
-            item.filterText = `:${x.tags.join(' ')} ${x.name} ${x.description} ${x.category}:`;
+            item.filterText = `:${x.name} ${x.tags.join(' ')} ${x.description} ${x.category}:`;
             item.documentation = new vscode.MarkdownString([
                 `# ${x.emoji}`,
                 `_${x.category}: ${x.tags.concat(x.description).join(', ')}_`,
@@ -82,7 +82,7 @@ export default class EmojiCompletionProvider implements vscode.CompletionItemPro
                 label: `::${x.name} ${x.emoji}`,
                 description: x.tags.join(',  ')
             }, kind);
-            item.filterText = `::${x.tags.join(' ')} ${x.name} ${x.description} ${x.category}`;
+            item.filterText = `::${x.name} ${x.tags.join(' ')} ${x.description} ${x.category}`;
             item.documentation = new vscode.MarkdownString([
                 `# ${x.emoji}`,
                 `_${x.category}: ${x.tags.concat(x.description).join(', ')}_`,
