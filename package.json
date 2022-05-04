@@ -168,6 +168,7 @@
     }
   },
   "scripts": {
+    "compile": "webpack --config ./build/webpack.config.js",
     "watch": "webpack --watch --config ./build/webpack.config.js",
     "package": "webpack --mode production --config ./build/webpack.config.js",
     "lint": "eslint -c .eslintrc.js --ext .ts src",

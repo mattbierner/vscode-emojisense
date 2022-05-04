@@ -1,27 +1,13 @@
 {
     "version": "2.0.0",
-
-    // we want to run npm
-    "command": "npm",
-
-    // we run the custom script "compile" as defined in package.json
-    "args": ["run", "compile", "--loglevel", "silent"],
-
-    // The tsc compiler is started in watching mode
-    "isBackground": true,
-
-    // use the standard tsc in watch mode problem matcher to find compile problems in the output.
-    "problemMatcher": "$tsc-watch",
     "tasks": [
         {
-            "label": "npm",
+            "label": "watch",
             "type": "shell",
             "command": "npm",
             "args": [
                 "run",
-                "compile",
-                "--loglevel",
-                "silent"
+                "compile"
             ],
             "isBackground": true,
             "problemMatcher": "$tsc-watch",
