@@ -29,7 +29,11 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "onStartupFinished",
+    "onCommand:emojisense.quickEmoji",
+    "onCommand:emojisense.quickEmojitext",
+    "onCommand:emojisense.quickEmojiTerminal",
+    "onCommand:emojisense.quickEmojitextTerminal"
   ],
   "main": "./dist/extension",
   "browser": "./dist/web/extension.js",
