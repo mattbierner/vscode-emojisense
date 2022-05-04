@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.9.1 - May 4, 2022
+- Use more specific activation events.
+- Update gemoji package.
+
 ## 0.9.0 - September 7, 2021
 - Update gemoji package.
 - Add support for running in web environments
