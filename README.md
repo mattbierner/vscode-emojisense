@@ -28,6 +28,8 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 
 - `emojisense.emojiDecoratorsEnabled`: Show emoji decorators inline for `:smile_cat:` markup in a file? Enabled by default in markdown.
 
+- `emojisense.enableForAllLanguages`: Enable implicitly for all languages.
+
 ## Per Language Configuration
 
 *Emojisense* is enabled by default in markdown, git commits, and plaintext files. You can enable it in other languages using `"emojisense.languages"`
