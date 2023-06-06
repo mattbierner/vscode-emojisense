@@ -5,6 +5,7 @@ interface LanguageConfig {
     readonly markupCompletionsEnabled?: boolean;
     readonly showOnColon?: boolean;
     readonly emojiDecoratorsEnabled?: boolean;
+    readonly enableForAllLanguages?: boolean;
 }
 
 export class Configuration implements LanguageConfig {
@@ -17,11 +18,8 @@ export class Configuration implements LanguageConfig {
     public markupCompletionsEnabled = true;
     public showOnColon = true;
     public emojiDecoratorsEnabled = true;
+    public enableForAllLanguages = false;
     private languageConfigurations = new Map<string, LanguageConfig>();
-
-    constructor() {
-        this.updateConfiguration();
-    }
 
     public areUnicodeCompletionsEnabled(document: vscode.TextDocument): boolean {
         return this.is('unicodeCompletionsEnabled', this.getLanguageId(document));
@@ -39,21 +37,31 @@ export class Configuration implements LanguageConfig {
         return this.is('emojiDecoratorsEnabled', forLanguage);
     }
 
-    public updateConfiguration(): void {
+    public async updateConfiguration(): Promise<void> {
         const config = vscode.workspace.getConfiguration('emojisense');
         this.unicodeCompletionsEnabled = config.get<boolean>('unicodeCompletionsEnabled', true);
         this.markupCompletionsEnabled = config.get<boolean>('markupCompletionsEnabled', true);
         this.showOnColon = config.get<boolean>('showOnColon', true);
         this.emojiDecoratorsEnabled = config.get<boolean>('emojiDecoratorsEnabled', true);
+        this.enableForAllLanguages = config.get<boolean>('enableForAllLanguages', false);
 
         this.languageConfigurations = new Map();
         const languagesConfig = config.get<any>('languages', {});
+
+        if (this.enableForAllLanguages) {
+            for await (const languageName of await vscode.languages.getLanguages()) {
+                this.languageConfigurations.set(languageName, {});
+            }
+        }
+
         for (const language of Object.keys(languagesConfig || {})) {
             const configValue = languagesConfig[language];
             const languageName = language.toLowerCase();
             if (typeof configValue === 'boolean') {
                 if (configValue) {
                     this.languageConfigurations.set(languageName, {});
+                } else {
+                    this.languageConfigurations.delete(languageName);
                 }
             } else {
                 this.languageConfigurations.set(languageName, configValue);
@@ -71,7 +79,7 @@ export class Configuration implements LanguageConfig {
             return false;
         }
 
-        return typeof languageConfig[setting] !== 'undefined' ? !!languageConfig[setting] : this[setting];
+        return languageConfig[setting] ?? this[setting];
     }
 
     private getLanguageConfig(languageId: string): LanguageConfig | undefined {

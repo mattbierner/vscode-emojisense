@@ -2,7 +2,7 @@
   "name": "emojisense",
   "displayName": ":emojisense:",
   "description": "Adds suggestions and autocomplete for emoji",
-  "version": "0.9.1",
+  "version": "0.10.1",
   "publisher": "bierner",
   "icon": "media/icon.png",
   "license": "MIT",
@@ -122,6 +122,11 @@
           "type": "boolean",
           "description": "Enables or disables emoji decorators for emoji markup.",
           "default": true
+        },
+        "emojisense.enableForAllLanguages": {
+          "type": "boolean",
+          "markdownDescription": "Enable emoji for all languages by default",
+          "default": false
         },
         "emojisense.languages": {
           "type": "object",
