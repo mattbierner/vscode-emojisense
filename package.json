@@ -178,7 +178,6 @@
     "@typescript-eslint/eslint-plugin": "^5.59.0",
     "@typescript-eslint/parser": "^5.59.0",
     "eslint": "^8.42.0",
-    "path-browserify": "^1.0.1",
     "process": "^0.11.10",
     "ts-loader": "^9.2.5",
     "typescript": "^5.1.3",
