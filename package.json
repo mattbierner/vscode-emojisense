@@ -123,14 +123,9 @@
           "description": "Enables or disables emoji decorators for emoji markup.",
           "default": true
         },
-        "emojisense.enableForAllLanguages": {
-          "type": "boolean",
-          "markdownDescription": "Enable emoji for all languages by default",
-          "default": false
-        },
         "emojisense.languages": {
           "type": "object",
-          "description": "Controls which languages emojisense is active in. You can also customize emojisense settings per language.",
+          "description": "Controls which languages emojisense is active in. You can also customize emojisense settings per language.\nTo enable emojisense for all languages, use \"*\": true",
           "default": {
             "markdown": true,
             "plaintext": {

@@ -5,7 +5,6 @@ interface LanguageConfig {
     readonly markupCompletionsEnabled?: boolean;
     readonly showOnColon?: boolean;
     readonly emojiDecoratorsEnabled?: boolean;
-    readonly enableForAllLanguages?: boolean;
 }
 
 export class Configuration implements LanguageConfig {
@@ -18,8 +17,8 @@ export class Configuration implements LanguageConfig {
     public markupCompletionsEnabled = true;
     public showOnColon = true;
     public emojiDecoratorsEnabled = true;
-    public enableForAllLanguages = false;
-    private languageConfigurations = new Map<string, LanguageConfig>();
+
+    private readonly languageConfigurations = new Map<string, LanguageConfig>();
 
     public areUnicodeCompletionsEnabled(document: vscode.TextDocument): boolean {
         return this.is('unicodeCompletionsEnabled', this.getLanguageId(document));
@@ -43,12 +42,11 @@ export class Configuration implements LanguageConfig {
         this.markupCompletionsEnabled = config.get<boolean>('markupCompletionsEnabled', true);
         this.showOnColon = config.get<boolean>('showOnColon', true);
         this.emojiDecoratorsEnabled = config.get<boolean>('emojiDecoratorsEnabled', true);
-        this.enableForAllLanguages = config.get<boolean>('enableForAllLanguages', false);
 
-        this.languageConfigurations = new Map();
+        this.languageConfigurations.clear();
         const languagesConfig = config.get<any>('languages', {});
 
-        if (this.enableForAllLanguages) {
+        if (languagesConfig['*']) {
             for await (const languageName of await vscode.languages.getLanguages()) {
                 this.languageConfigurations.set(languageName, {});
             }

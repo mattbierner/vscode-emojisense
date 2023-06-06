@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.10.0 - June 5, 2023
+- Turn on emoji completions in all languages using  `emojisense.languages: { "*": true }`. Thanks @RoccoCocco!
+- Update gemoji package.
+
 ## 0.9.1 - May 4, 2022
 - Use more specific activation events.
 - Update gemoji package.
