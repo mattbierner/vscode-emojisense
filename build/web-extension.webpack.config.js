@@ -20,7 +20,6 @@ module.exports = /** @type WebpackConfig */ {
             process: "process/browser"
         },
         fallback: {
-            "path": require.resolve('path-browserify'),
             "fs": false
         }
     },

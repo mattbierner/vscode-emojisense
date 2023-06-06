@@ -1,6 +1,6 @@
-import base64 from 'base-64';
-import utf8 from 'utf8';
-import * as vscode from "vscode";
+
+import { TextEncoder } from 'util';
+import * as vscode from 'vscode';
 import { Configuration } from './configuration';
 import { Emoji, EmojiProvider } from './emoji';
 
@@ -95,7 +95,20 @@ export default class DecoratorProvider extends vscode.Disposable {
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="${width}px" height="${height}px" viewBox="0 0 ${width} ${height}" xml:space="preserve">
      <text x="50%" y="50%" text-anchor="middle" alignment-baseline="central" font-size="120">${emoji.emoji}</text>
 </svg>`;
-        const dataUri = 'data:image/svg+xml;charset=UTF-8;base64,' + base64.encode(utf8.encode(src));
+        const dataUri = 'data:image/svg+xml;charset=UTF-8;base64,' + multibyteBtoa(src);
         return `![](${dataUri})`;
     }
+}
+
+/**
+ * From https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/btoa
+ */
+function multibyteBtoa(str: string): string {
+    const encoder = new TextEncoder();
+    let binary = '';
+    const uint8array = encoder.encode(str);
+    for (let i = 0; i < uint8array.length; i++) {
+        binary += String.fromCharCode(uint8array[i]);
+    }
+    return btoa(binary);
 }
