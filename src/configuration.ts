@@ -21,11 +21,11 @@ export class Configuration implements LanguageConfig {
     private readonly languageConfigurations = new Map<string, LanguageConfig>();
 
     public areUnicodeCompletionsEnabled(document: vscode.TextDocument): boolean {
-        return this.is('unicodeCompletionsEnabled', this.getLanguageId(document));
+        return this.is('unicodeCompletionsEnabled', document.languageId);
     }
 
     public areMarkupCompletionsEnabled(document: vscode.TextDocument): boolean {
-        return this.is('markupCompletionsEnabled', this.getLanguageId(document));
+        return this.is('markupCompletionsEnabled', document.languageId);
     }
 
     public shouldShowOnColon(forLanguage: string): boolean {
@@ -36,7 +36,7 @@ export class Configuration implements LanguageConfig {
         return this.is('emojiDecoratorsEnabled', forLanguage);
     }
 
-    public async updateConfiguration(): Promise<void> {
+    public updateConfiguration() {
         const config = vscode.workspace.getConfiguration('emojisense');
         this.unicodeCompletionsEnabled = config.get<boolean>('unicodeCompletionsEnabled', true);
         this.markupCompletionsEnabled = config.get<boolean>('markupCompletionsEnabled', true);
@@ -45,12 +45,6 @@ export class Configuration implements LanguageConfig {
 
         this.languageConfigurations.clear();
         const languagesConfig = config.get<any>('languages', {});
-
-        if (languagesConfig['*']) {
-            for (const languageName of await vscode.languages.getLanguages()) {
-                this.languageConfigurations.set(languageName, {});
-            }
-        }
 
         for (const language of Object.keys(languagesConfig || {})) {
             const configValue = languagesConfig[language];
@@ -67,12 +61,8 @@ export class Configuration implements LanguageConfig {
         }
     }
 
-    private getLanguageId(document: vscode.TextDocument): string {
-        return document.languageId;
-    }
-
     private is(setting: keyof LanguageConfig, forLanguage: string): boolean {
-        const languageConfig = this.getLanguageConfig(forLanguage);
+        const languageConfig = this.getLanguageConfig(forLanguage) ?? this.getLanguageConfig('*');
         if (!languageConfig) {
             return false;
         }

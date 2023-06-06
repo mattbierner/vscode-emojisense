@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { Configuration } from './configuration';
 import DecoratorProvider from "./DecoratorProvider";
-import { EmojiProvider } from './emoji';
 import EmojiCompletionProvider from './EmojiCompletionProvider';
+import { Configuration } from './configuration';
+import { EmojiProvider } from './emoji';
 import { quickEmoji } from "./quickEmoji";
 
 function registerProviders(
@@ -19,12 +19,12 @@ function registerProviders(
     return vscode.Disposable.from(...disposables);
 }
 
-export async function activate(context: vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext) {
     const emoji = new EmojiProvider();
     const config = new Configuration();
     const provider = new EmojiCompletionProvider(emoji, config);
 
-    await config.updateConfiguration();
+    config.updateConfiguration();
 
     let providerSub = registerProviders(provider, config);
 
@@ -36,8 +36,8 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('emojisense.quickEmojitextTerminal', emojiPicker('name', 'terminal')),
     );
 
-    vscode.workspace.onDidChangeConfiguration(async () => {
-        await config.updateConfiguration();
+    vscode.workspace.onDidChangeConfiguration(() => {
+        config.updateConfiguration();
         providerSub.dispose();
         providerSub = registerProviders(provider, config);
     }, null, context.subscriptions);
