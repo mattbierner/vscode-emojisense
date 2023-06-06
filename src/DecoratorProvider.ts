@@ -1,5 +1,4 @@
 
-import { TextEncoder } from 'util';
 import * as vscode from 'vscode';
 import { Configuration } from './configuration';
 import { Emoji, EmojiProvider } from './emoji';
