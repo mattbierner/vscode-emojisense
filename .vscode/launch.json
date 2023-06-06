@@ -1,30 +1,34 @@
 // A launch configuration that compiles the extension and then opens it inside a new window
 {
-    "version": "0.1.0",
+    "version": "0.2.0",
     "configurations": [
         {
             "name": "Launch Extension",
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "args": ["--extensionDevelopmentPath=${workspaceRoot}" ],
+            "args": [
+                "--extensionDevelopmentPath=${workspaceRoot}"
+            ],
             "sourceMaps": true,
-            "outFiles": [ "${workspaceRoot}/out/src/**/*.js" ],
-            "preLaunchTask": "watch"
+            "outFiles": [
+                "${workspaceRoot}/dist/**/*.js"
+            ],
+            "preLaunchTask": "watch",
         },
         {
-          "name": "Run Web Extension in VS Code",
-          "type": "pwa-extensionHost",
-          "debugWebWorkerHost": true,
-          "request": "launch",
-          "args": [
-            "--extensionDevelopmentPath=${workspaceFolder}",
-            "--extensionDevelopmentKind=web"
-          ],
-          "outFiles": [
-            "${workspaceFolder}/dist/web/**/*.js"
-          ],
-          "preLaunchTask": "npm: watch-web"
+            "name": "Run Web Extension in VS Code",
+            "type": "extensionHost",
+            "debugWebWorkerHost": true,
+            "request": "launch",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}",
+                "--extensionDevelopmentKind=web"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/dist/web/**/*.js"
+            ],
+            "preLaunchTask": "npm: watch-web"
         }
     ]
 }

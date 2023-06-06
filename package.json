@@ -2,7 +2,7 @@
   "name": "emojisense",
   "displayName": ":emojisense:",
   "description": "Adds suggestions and autocomplete for emoji",
-  "version": "0.10.1",
+  "version": "0.10.0",
   "publisher": "bierner",
   "icon": "media/icon.png",
   "license": "MIT",
@@ -17,7 +17,7 @@
     "emoticons"
   ],
   "engines": {
-    "vscode": "^1.45.0"
+    "vscode": "^1.75.0"
   },
   "repository": {
     "url": "https://github.com/mattbierner/vscode-emojisense.git"
@@ -29,11 +29,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onStartupFinished",
-    "onCommand:emojisense.quickEmoji",
-    "onCommand:emojisense.quickEmojitext",
-    "onCommand:emojisense.quickEmojiTerminal",
-    "onCommand:emojisense.quickEmojitextTerminal"
+    "onStartupFinished"
   ],
   "main": "./dist/extension",
   "browser": "./dist/web/extension.js",
