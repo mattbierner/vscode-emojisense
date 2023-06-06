@@ -7,9 +7,9 @@ export interface Emoji {
 
 export class EmojiProvider {
     private _emojiMap?: Map<string, Emoji>;
-    private _emojis?: ReadonlyArray<Emoji>;
+    private _emojis?: readonly Emoji[];
 
-    public get emojis(): ReadonlyArray<Emoji> {
+    public get emojis(): readonly Emoji[] {
         if (!this._emojis) {
             this._emojis = Array.from(this.emojiMap.values());
         }

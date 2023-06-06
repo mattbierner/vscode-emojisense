@@ -47,7 +47,7 @@ export class Configuration implements LanguageConfig {
         const languagesConfig = config.get<any>('languages', {});
 
         if (languagesConfig['*']) {
-            for await (const languageName of await vscode.languages.getLanguages()) {
+            for (const languageName of await vscode.languages.getLanguages()) {
                 this.languageConfigurations.set(languageName, {});
             }
         }
