@@ -28,8 +28,6 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 
 - `emojisense.emojiDecoratorsEnabled`: Show emoji decorators inline for `:smile_cat:` markup in a file? Enabled by default in markdown.
 
-- `emojisense.enableForAllLanguages`: Enable implicitly for all languages.
-
 ## Per Language Configuration
 
 *Emojisense* is enabled by default in markdown, git commits, and plaintext files. You can enable it in other languages using `"emojisense.languages"`
@@ -43,7 +41,7 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 }
 ```
 
-The language keys here come from [VS Code's list of language identifiers](https://code.visualstudio.com/docs/languages/identifiers)
+The language keys here come from [VS Code's list of language identifiers](https://code.visualstudio.com/docs/languages/identifiers).
 
 You can also change the settings for each language. Here's the default emojisense configuration for example:
 
@@ -58,9 +56,15 @@ You can also change the settings for each language. Here's the default emojisens
 }
 ```
 
-Whenever a value is left unspecified, the top level setting is used instead. In this case, markdown files will fallback to use the top level `emojisense.unicodeCompletionsEnabled` and `emojisense.markupCompletionsEnabled` settings, while plaintext files will have `markupCompletionsEnabled` disabled and fallback to the `emojisense.unicodeCompletionsEnabled` setting
+Whenever a value is left unspecified, the top level setting is used instead. In this case, markdown files will fallback to use the top level `emojisense.unicodeCompletionsEnabled` and `emojisense.markupCompletionsEnabled` settings, while plaintext files will have `markupCompletionsEnabled` disabled and fallback to the `emojisense.unicodeCompletionsEnabled` setting.
 
+You can enable emojisense for all languages using `*`:
 
+```jsonc
+"emojisense.languages": {
+    "*scminput*": true
+}
+```
 
 ## Credits
 
