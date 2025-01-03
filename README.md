@@ -68,7 +68,7 @@ You can enable emojisense for all languages using `*`:
 
 ## Credits
 
-- Icon from emojione: https://www.emojione.com
+- Icon from emojione: [joypixels.com](https://joypixels.com) ([EmojiOne is Now JoyPixels](https://blog.joypixels.com/emojione-is-now-joypixels))
 - [Atom autocomplete+ emojis suggestions plugin][atom]
 
 
