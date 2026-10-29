@@ -20,6 +20,10 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 
 ## General Configuration
 
+- `emojisense.picker.preferExactMatch`: Rank exact shortcode matches first and automatically focus them in the emoji picker, so Enter selects them. Enabled by default. Names are matched without case sensitivity, with or without surrounding colons (for example, `smile` or `:smile:`). Other fuzzy matches remain available, and you can use the arrow keys to select another result.
+
+- `emojisense.picker.preferPrefixMatch`: Rank shortcode prefixes ahead of other fuzzy matches. Enabled by default. For example, `smile` ranks the single exact match `smile` first, then `smile_cat`, then fuzzy matches such as `sweat_smile`. Set both picker preferences to `false` to retain the original picker labels, descriptions, ordering, and selection behavior, with no custom input handler.
+
 - `emojisense.unicodeCompletionsEnabled`: Enable completions that insert emoji as unicode, i.e. `:smile_cat:` -> 😸
 
 - `emojisense.markupCompletionsEnabled`: Enable completions that insert emoji markup, i.e. `::smile_cat` -> `:smile_cat:`
@@ -65,6 +69,10 @@ You can enable emojisense for all languages using `*`:
     "*scminput*": true
 }
 ```
+
+## Development
+
+Run `npm ci`, then `npm test` to run the picker regression tests. The tests exercise the TypeScript implementation with mocked VS Code APIs, covering exact and prefix preferences, candidate retention, and editor/terminal insertion. Native VS Code filtering and rendering require a separate extension-host check.
 
 ## Credits
 

@@ -100,6 +100,16 @@
     "configuration": {
       "title": ":emojisense:",
       "properties": {
+        "emojisense.picker.preferExactMatch": {
+          "type": "boolean",
+          "markdownDescription": "Rank exact emoji shortcode matches first and automatically focus them in the picker. Accepts names with or without surrounding colons, such as `smile` or `:smile:`. Other fuzzy matches remain available.",
+          "default": true
+        },
+        "emojisense.picker.preferPrefixMatch": {
+          "type": "boolean",
+          "markdownDescription": "Rank emoji shortcodes starting with the input ahead of other fuzzy matches in the picker. Exact matches take priority when preferExactMatch is enabled.",
+          "default": true
+        },
         "emojisense.unicodeCompletionsEnabled": {
           "type": "boolean",
           "markdownDescription": "Enable completions that insert emoji as unicode, i.e. `:smile_cat:` -> 😸",
@@ -165,6 +175,7 @@
     }
   },
   "scripts": {
+    "test": "node --test test/quickEmoji.test.cjs",
     "compile": "webpack --config ./build/webpack.config.js",
     "watch": "webpack --watch --config ./build/webpack.config.js",
     "package": "webpack --mode production --config ./build/webpack.config.js",
