@@ -35,6 +35,7 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
     let onChange;
     let onAccept;
     let onHide;
+    let onButton;
     let items = [];
     let inputValue = '';
     let valueUpdates = 0;
@@ -76,11 +77,13 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
         onDidChangeValue(callback) { onChange = callback; return subscribe(); },
         onDidAccept(callback) { onAccept = callback; return subscribe(); },
         onDidHide(callback) { onHide = callback; return subscribe(); },
+        onDidTriggerButton(callback) { onButton = callback; return subscribe(); },
         show() { if (showError) throw showError; },
         hide() { onHide(); },
         dispose() { disposed = true; },
     };
     const api = {
+        ThemeIcon: class { constructor(id) { this.id = id; } },
         workspace: {
             getConfiguration: () => ({ get: (key, fallback) => settings[key] ?? fallback }),
         },
@@ -121,6 +124,7 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
             picker.value = value;
         },
         select(name) { activeItems = [items.find(item => item.emoji.name === name)]; },
+        toggleDescriptions() { onButton(picker.buttons[0]); },
         async accept() {
             picker.selectedItems = activeItems;
             onAccept();
@@ -195,6 +199,74 @@ test('description search can be disabled without disabling shortcode search or r
     session.change('smile');
     assert.deepEqual(session.names, combinations[3].expected);
 });
+
+test('descriptions can be hidden and shown without closing or changing the query or selection', async t => {
+    const session = openPicker();
+    t.after(() => session.cancel());
+    session.change('smile');
+    session.select('smile_cat');
+    const order = session.names;
+    const selected = session.picker.activeItems[0];
+    assert.equal(session.picker.buttons[0].tooltip, 'Hide descriptions');
+    session.toggleDescriptions();
+    assert.equal(session.picker.matchOnDetail, false);
+    assert(session.picker.items.every(item => item.detail === undefined));
+    assert.equal(session.picker.buttons[0].tooltip, 'Show descriptions');
+    assert.equal(session.picker.value, 'smile');
+    assert.equal(session.picker.activeItems[0], selected);
+    assert.deepEqual(session.names, order);
+    assert.equal(session.disposed, false);
+    assert.deepEqual(session.historyState.names, []);
+
+    session.toggleDescriptions();
+    assert.equal(session.picker.matchOnDetail, true);
+    assert(session.picker.items.every(item => item.detail === item.emoji.description));
+    assert.equal(session.picker.buttons[0].tooltip, 'Hide descriptions');
+    assert.equal(session.picker.activeItems[0], selected);
+    assert.deepEqual(session.names, order);
+});
+
+test('descriptions can be shown when all input preferences start disabled', async t => {
+    const session = openPicker({ settings: {
+        'picker.searchDescriptions': false, 'picker.preferExactMatch': false,
+        'picker.preferPrefixMatch': false, 'picker.ignoreSpaces': false,
+    } });
+    t.after(() => session.cancel());
+    assert.equal(session.hasChangeHandler, false);
+    assert.equal(session.picker.matchOnDetail, false);
+    session.toggleDescriptions();
+    assert.equal(session.picker.matchOnDetail, true);
+    assert.deepEqual(session.picker.items.map(item => item.detail), emojis.map(item => item.description));
+    assert.deepEqual(session.names, originalNames);
+    assert.equal(session.hasChangeHandler, false);
+});
+
+test('description toggle is local to the open picker and does not change the saved default', async t => {
+    const settings = { 'picker.searchDescriptions': false };
+    const first = openPicker({ settings });
+    first.toggleDescriptions();
+    assert.equal(first.picker.matchOnDetail, true);
+    await first.cancel();
+    const second = openPicker({ settings });
+    t.after(() => second.cancel());
+    assert.equal(second.picker.matchOnDetail, false);
+    assert(second.picker.items.every(item => item.detail === undefined));
+    assert.equal(second.picker.buttons[0].tooltip, 'Show descriptions');
+});
+
+for (const property of ['emoji', 'name']) {
+    test(`toggling descriptions preserves ${property} insertion and shared history`, async () => {
+        const session = openPicker({ property });
+        session.change('smile');
+        session.toggleDescriptions();
+        session.select('smile_cat');
+        await session.accept();
+        assert.deepEqual(session.insertions, [property === 'emoji' ? '😸' : ':smile_cat:']);
+        assert.deepEqual(session.historyState.names, ['smile_cat']);
+        assert.equal(session.activeSubscriptions, 0);
+        assert.equal(session.disposed, true);
+    });
+}
 
 test('description search works independently of exact and prefix preferences', async t => {
     const session = openPicker({ settings: {

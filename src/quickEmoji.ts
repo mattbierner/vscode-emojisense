@@ -1,4 +1,4 @@
-import { commands, Disposable, Memento, QuickPickItem, window, workspace } from 'vscode';
+import { commands, Disposable, Memento, QuickPickItem, ThemeIcon, window, workspace } from 'vscode';
 import { Emoji, EmojiProvider } from './emoji';
 
 export type EmojiDestination = 'terminal' | 'editor';
@@ -38,7 +38,7 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
             const config = workspace.getConfiguration('emojisense', window.activeTextEditor?.document.uri);
             const preferExactMatch = config.get<boolean>('picker.preferExactMatch', true);
             const preferPrefixMatch = config.get<boolean>('picker.preferPrefixMatch', true);
-            const searchDescriptions = config.get<boolean>('picker.searchDescriptions', true);
+            let searchDescriptions = config.get<boolean>('picker.searchDescriptions', true);
             const ignoreSpaces = config.get<boolean>('picker.ignoreSpaces', true);
             const recent = new Set(recentItems());
             const orderedItems = recent.size
@@ -50,19 +50,34 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
             let selectedItem: EmojiQuickPickItem | undefined;
             try {
                 selectedItem = await new Promise<EmojiQuickPickItem | undefined>((resolve) => {
-                    const rankedItems = preferExactMatch || preferPrefixMatch || searchDescriptions
-                        ? orderedItems.map(item => ({
-                            ...item,
-                            description: preferExactMatch || preferPrefixMatch ? `:${item.emoji.name}:` : item.description,
-                            detail: searchDescriptions ? item.emoji.description : undefined,
-                        }))
-                        : orderedItems;
+                    const rankedItems: EmojiQuickPickItem[] = orderedItems.map(item => ({
+                        ...item,
+                        description: preferExactMatch || preferPrefixMatch ? `:${item.emoji.name}:` : item.description,
+                        detail: searchDescriptions ? item.emoji.description : undefined,
+                    }));
                     picker.items = rankedItems;
                     let displayedItems = rankedItems;
                     picker.matchOnDescription = true;
                     picker.matchOnDetail = searchDescriptions;
                     picker.placeholder = 'Your Emoji Code';
                     picker.title = property === 'emoji' ? 'Emoji Picker' : 'Emoji Code Picker';
+                    const showDescriptions = { iconPath: new ThemeIcon('list-selection'), tooltip: 'Show descriptions' };
+                    const hideDescriptions = { iconPath: new ThemeIcon('list-selection'), tooltip: 'Hide descriptions' };
+                    picker.buttons = [searchDescriptions ? hideDescriptions : showDescriptions];
+                    disposables.push(picker.onDidTriggerButton(button => {
+                        if (button !== showDescriptions && button !== hideDescriptions) {
+                            return;
+                        }
+                        searchDescriptions = !searchDescriptions;
+                        for (const item of rankedItems) {
+                            item.detail = searchDescriptions ? item.emoji.description : undefined;
+                        }
+                        const activeItems = picker.activeItems;
+                        picker.matchOnDetail = searchDescriptions;
+                        picker.items = displayedItems;
+                        picker.activeItems = activeItems;
+                        picker.buttons = [searchDescriptions ? hideDescriptions : showDescriptions];
+                    }));
                     if (preferExactMatch || preferPrefixMatch || ignoreSpaces) {
                         disposables.push(picker.onDidChangeValue(value => {
                             const query = ignoreSpaces ? value.replace(/ /g, '') : value;
