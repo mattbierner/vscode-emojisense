@@ -34,7 +34,7 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
 
     return (property: keyof Emoji, destination: EmojiDestination) => {
         return async () => {
-
+            let insertionProperty = property;
             const config = workspace.getConfiguration('emojisense', window.activeTextEditor?.document.uri);
             const preferExactMatch = config.get<boolean>('picker.preferExactMatch', true);
             const preferPrefixMatch = config.get<boolean>('picker.preferPrefixMatch', true);
@@ -60,11 +60,28 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
                     picker.matchOnDescription = true;
                     picker.matchOnDetail = searchDescriptions;
                     picker.placeholder = 'Your Emoji Code';
-                    picker.title = property === 'emoji' ? 'Emoji Picker' : 'Emoji Code Picker';
                     const showDescriptions = { iconPath: new ThemeIcon('list-selection'), tooltip: 'Show descriptions' };
                     const hideDescriptions = { iconPath: new ThemeIcon('list-selection'), tooltip: 'Hide descriptions' };
-                    picker.buttons = [searchDescriptions ? hideDescriptions : showDescriptions];
+                    const useShortcode = { iconPath: new ThemeIcon('symbol-key'), tooltip: 'Insert :shortcode: instead' };
+                    const useEmoji = { iconPath: new ThemeIcon('smiley'), tooltip: 'Insert emoji instead' };
+                    const updateControls = () => {
+                        picker.title = insertionProperty === 'emoji' ? '😃 Emoji Picker' : ':smiley: Emoji Code Picker';
+                        picker.buttons = [
+                            searchDescriptions ? hideDescriptions : showDescriptions,
+                            insertionProperty === 'emoji' ? useShortcode : useEmoji,
+                        ];
+                    };
+                    const toggleInsertionMode = () => {
+                        insertionProperty = insertionProperty === 'emoji' ? 'name' : 'emoji';
+                        updateControls();
+                    };
+                    updateControls();
+                    disposables.push(commands.registerCommand('emojisense.togglePickerInsertionMode', toggleInsertionMode));
                     disposables.push(picker.onDidTriggerButton(button => {
+                        if (button === useShortcode || button === useEmoji) {
+                            toggleInsertionMode();
+                            return;
+                        }
                         if (button !== showDescriptions && button !== hideDescriptions) {
                             return;
                         }
@@ -76,7 +93,7 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
                         picker.matchOnDetail = searchDescriptions;
                         picker.items = displayedItems;
                         picker.activeItems = activeItems;
-                        picker.buttons = [searchDescriptions ? hideDescriptions : showDescriptions];
+                        updateControls();
                     }));
                     if (preferExactMatch || preferPrefixMatch || ignoreSpaces) {
                         disposables.push(picker.onDidChangeValue(value => {
@@ -125,17 +142,19 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
                     disposables.push(picker.onDidHide(() => {
                         resolve(undefined);
                     }));
+                    void commands.executeCommand('setContext', 'emojisense.pickerOpen', true);
                     picker.show();
                 });
             } finally {
                 disposables.forEach(disposable => disposable.dispose());
                 picker.dispose();
+                void commands.executeCommand('setContext', 'emojisense.pickerOpen', false);
             }
             if (!selectedItem) {
                 return;
             }
 
-            const insert = property === 'name' ? `:${selectedItem.emoji.name}:` : selectedItem.emoji.emoji;
+            const insert = insertionProperty === 'name' ? `:${selectedItem.emoji.name}:` : selectedItem.emoji.emoji;
             switch (destination) {
                 case 'terminal':
                     if (window.activeTerminal) {

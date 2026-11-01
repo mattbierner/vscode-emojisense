@@ -37,6 +37,12 @@
   "contributes": {
     "commands": [
       {
+        "command": "emojisense.togglePickerInsertionMode",
+        "title": "Toggle emoji / :shortcode: insertion",
+        "category": "Emojisense",
+        "enablement": "emojisense.pickerOpen"
+      },
+      {
         "command": "emojisense.quickEmoji",
         "title": "Pick an emoji and insert in editor",
         "category": "Emojisense"
@@ -60,6 +66,10 @@
     "menus": {
       "commandPalette": [
         {
+          "command": "emojisense.togglePickerInsertionMode",
+          "when": "false"
+        },
+        {
           "command": "emojisense.quickEmojiTerminal",
           "when": "panelFocus && activeViewlet == 'workbench.panel.terminal'"
         },
@@ -70,6 +80,13 @@
       ]
     },
     "keybindings": [
+      {
+        "mac": "shift+cmd+i",
+        "key": "shift+ctrl+i",
+        "linux": "shift+ctrl+alt+i",
+        "command": "emojisense.togglePickerInsertionMode",
+        "when": "emojisense.pickerOpen && inQuickOpen"
+      },
       {
         "mac": "cmd+i",
         "key": "ctrl+i",

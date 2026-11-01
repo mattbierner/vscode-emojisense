@@ -15,6 +15,7 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
     - Mac: <kbd>cmd</kbd> + <kbd>i</kbd>
     - Linux: <kbd>ctrl</kbd> + <kbd>alt</kbd> + <kbd>i</kbd>
     - Windows: <kbd>ctrl</kbd> + <kbd>i</kbd>
+- While the picker is open, use its insertion-mode button to switch between emoji and `:shortcode:` output, or press Shift+Cmd+I on macOS, Shift+Ctrl+Alt+I on Linux, or Shift+Ctrl+I on Windows. The title shows the current mode. Switching preserves your search and selection, and each opening starts in the mode of the command you used.
 - The emoji and shortcode pickers share the last 200 successfully inserted shortcodes, most recent first, across editors, terminals, and workspaces. History persists across restarts in the current VS Code profile. Exact and prefix preferences take priority while searching; clearing the search restores recent history order. A history storage failure does not interrupt insertion.
 
 [List of supported emoji][cheat]

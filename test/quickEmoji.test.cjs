@@ -47,6 +47,8 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
     const insertions = [];
     const terminalWrites = [];
     const commands = [];
+    const commandHandlers = new Map();
+    const contexts = new Map();
     const warnings = [];
     const subscribe = () => {
         activeSubscriptions++;
@@ -99,7 +101,23 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
             },
             activeTerminal: { sendText: (text, addNewLine) => terminalWrites.push({ text, addNewLine }) },
         },
-        commands: { executeCommand: async command => { commands.push(command); } },
+        commands: {
+            registerCommand(command, handler) {
+                assert(!commandHandlers.has(command));
+                commandHandlers.set(command, handler);
+                const subscription = subscribe();
+                return { dispose() { commandHandlers.delete(command); subscription.dispose(); } };
+            },
+            executeCommand: async (command, ...args) => {
+                if (command === 'setContext') {
+                    contexts.set(args[0], args[1]);
+                } else if (commandHandlers.has(command)) {
+                    return commandHandlers.get(command)(...args);
+                } else {
+                    commands.push(command);
+                }
+            },
+        },
     };
     const exports = {};
     new Function('require', 'exports', 'console', code)(name => {
@@ -109,7 +127,7 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
     const done = exports.quickEmoji({ emojis: dataset }, historyState)(property, destination)();
 
     return {
-        picker, done, api, insertions, terminalWrites, commands, historyState, warnings,
+        picker, done, api, insertions, terminalWrites, commands, commandHandlers, contexts, historyState, warnings,
         get names() { return picker.items.map(item => item.emoji.name); },
         get itemUpdates() { return itemUpdates; },
         get focusUpdates() { return focusUpdates; },
@@ -125,6 +143,7 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
         },
         select(name) { activeItems = [items.find(item => item.emoji.name === name)]; },
         toggleDescriptions() { onButton(picker.buttons[0]); },
+        toggleInsertionMode() { onButton(picker.buttons[1]); },
         async accept() {
             picker.selectedItems = activeItems;
             onAccept();
@@ -152,6 +171,100 @@ const combinations = [
         focused: 'smile',
     },
 ];
+
+for (const property of ['emoji', 'name']) {
+    for (const destination of ['editor', 'terminal']) {
+        for (const via of ['button', 'command']) {
+            test(`switches ${property} insertion in ${destination} using ${via} without changing search or selection`, async () => {
+                const session = openPicker({ property, destination });
+                session.change('smile');
+                session.select('smile_cat');
+                const active = session.picker.activeItems[0];
+                const order = session.names;
+                const updates = session.itemUpdates;
+                assert.equal(session.contexts.get('emojisense.pickerOpen'), true);
+                assert.equal(session.picker.title, property === 'emoji' ? '😃 Emoji Picker' : ':smiley: Emoji Code Picker');
+                assert.equal(session.picker.buttons[1].tooltip,
+                    property === 'emoji' ? 'Insert :shortcode: instead' : 'Insert emoji instead');
+                if (via === 'button') {
+                    session.toggleInsertionMode();
+                } else {
+                    await session.api.commands.executeCommand('emojisense.togglePickerInsertionMode');
+                }
+                assert.equal(session.picker.title, property === 'emoji' ? ':smiley: Emoji Code Picker' : '😃 Emoji Picker');
+                assert.equal(session.picker.buttons[1].tooltip,
+                    property === 'emoji' ? 'Insert emoji instead' : 'Insert :shortcode: instead');
+                assert.equal(session.picker.value, 'smile');
+                assert.equal(session.picker.activeItems[0], active);
+                assert.deepEqual(session.names, order);
+                assert.equal(session.itemUpdates, updates);
+                assert.equal(session.picker.matchOnDetail, true);
+                assert.equal(session.disposed, false);
+                assert.deepEqual(session.historyState.names, []);
+                await session.accept();
+                const expected = property === 'emoji' ? ':smile_cat:' : '😸';
+                assert.deepEqual(session.insertions, destination === 'editor' ? [expected] : []);
+                assert.deepEqual(session.terminalWrites,
+                    destination === 'terminal' ? [{ text: expected, addNewLine: false }] : []);
+                assert.deepEqual(session.historyState.names, ['smile_cat']);
+                assert.equal(session.contexts.get('emojisense.pickerOpen'), false);
+                assert.equal(session.commandHandlers.size, 0);
+                assert.equal(session.activeSubscriptions, 0);
+            });
+        }
+    }
+}
+
+test('mode and description controls remain independent across repeated toggles', async () => {
+    const session = openPicker();
+    session.change('smile');
+    session.toggleInsertionMode();
+    session.toggleDescriptions();
+    assert.equal(session.picker.title, ':smiley: Emoji Code Picker');
+    assert.equal(session.picker.matchOnDetail, false);
+    assert.equal(session.picker.buttons[1].iconPath.id, 'smiley');
+    session.toggleInsertionMode();
+    assert.equal(session.picker.title, '😃 Emoji Picker');
+    assert.equal(session.picker.matchOnDetail, false);
+    assert.equal(session.picker.buttons[0].tooltip, 'Show descriptions');
+    session.toggleDescriptions();
+    assert.equal(session.picker.matchOnDetail, true);
+    assert.equal(session.picker.title, '😃 Emoji Picker');
+    await session.accept();
+    assert.deepEqual(session.insertions, ['😄']);
+});
+
+test('mode switching works with input preferences disabled and cancellation resets the next opening', async () => {
+    const settings = {
+        'picker.preferExactMatch': false, 'picker.preferPrefixMatch': false,
+        'picker.ignoreSpaces': false, 'picker.searchDescriptions': false,
+    };
+    const session = openPicker({ settings });
+    session.change('cat face');
+    session.toggleInsertionMode();
+    assert.equal(session.picker.value, 'cat face');
+    assert.equal(session.hasChangeHandler, false);
+    assert.deepEqual(session.names, originalNames);
+    await session.cancel();
+    assert.deepEqual(session.insertions, []);
+    assert.deepEqual(session.historyState.names, []);
+    assert.equal(session.contexts.get('emojisense.pickerOpen'), false);
+    assert.equal(session.commandHandlers.size, 0);
+    const next = openPicker({ settings });
+    assert.equal(next.picker.title, '😃 Emoji Picker');
+    await next.cancel();
+});
+
+test('mode shortcut is restricted to the open emoji picker', () => {
+    const { contributes } = require('../package.json');
+    const command = 'emojisense.togglePickerInsertionMode';
+    const binding = contributes.keybindings.find(binding => binding.command === command);
+    assert.equal(binding.when, 'emojisense.pickerOpen && inQuickOpen');
+    assert.equal(binding.mac, 'shift+cmd+i');
+    assert.equal(binding.key, 'shift+ctrl+i');
+    assert.equal(binding.linux, 'shift+ctrl+alt+i');
+    assert.equal(contributes.commands.find(entry => entry.command === command).enablement, 'emojisense.pickerOpen');
+});
 
 for (const { exact, prefix, expected, focused } of combinations) {
     test(`independent preferences: exact=${exact}, prefix=${prefix}`, async t => {
@@ -602,6 +715,8 @@ test('picker and event subscriptions are disposed if showing the picker fails', 
     await assert.rejects(session.done, error);
     assert.equal(session.activeSubscriptions, 0);
     assert.equal(session.disposed, true);
+    assert.equal(session.contexts.get('emojisense.pickerOpen'), false);
+    assert.equal(session.commandHandlers.size, 0);
     assert.deepEqual(session.insertions, []);
     assert.deepEqual(session.historyState.names, []);
 });
