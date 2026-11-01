@@ -175,7 +175,7 @@
     }
   },
   "scripts": {
-    "test": "node --test test/quickEmoji.test.cjs",
+    "test": "node --test",
     "compile": "webpack --config ./build/webpack.config.js",
     "watch": "webpack --watch --config ./build/webpack.config.js",
     "package": "webpack --mode production --config ./build/webpack.config.js",

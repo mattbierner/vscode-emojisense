@@ -15,6 +15,7 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
     - Mac: <kbd>cmd</kbd> + <kbd>i</kbd>
     - Linux: <kbd>ctrl</kbd> + <kbd>alt</kbd> + <kbd>i</kbd>
     - Windows: <kbd>ctrl</kbd> + <kbd>i</kbd>
+- The emoji and shortcode pickers share the last 200 successfully inserted shortcodes, most recent first, across editors, terminals, and workspaces. History persists across restarts in the current VS Code profile. Exact and prefix preferences take priority while searching; clearing the search restores recent history order. A history storage failure does not interrupt insertion.
 
 [List of supported emoji][cheat]
 
@@ -22,7 +23,7 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 
 - `emojisense.picker.preferExactMatch`: Rank exact shortcode matches first and automatically focus them in the emoji picker, so Enter selects them. Enabled by default. Names are matched without case sensitivity, with or without surrounding colons (for example, `smile` or `:smile:`). Other fuzzy matches remain available, and you can use the arrow keys to select another result.
 
-- `emojisense.picker.preferPrefixMatch`: Rank shortcode prefixes ahead of other fuzzy matches. Enabled by default. For example, `smile` ranks the single exact match `smile` first, then `smile_cat`, then fuzzy matches such as `sweat_smile`. Set both picker preferences to `false` to retain the original picker labels, descriptions, ordering, and selection behavior, with no custom input handler.
+- `emojisense.picker.preferPrefixMatch`: Rank shortcode prefixes ahead of other fuzzy matches. Enabled by default. For example, `smile` ranks the single exact match `smile` first, then `smile_cat`, then fuzzy matches such as `sweat_smile`. Set both picker preferences to `false` to disable match prioritization, with no custom input handler. Shared recent history still appears first.
 
 - `emojisense.unicodeCompletionsEnabled`: Enable completions that insert emoji as unicode, i.e. `:smile_cat:` -> 😸
 
