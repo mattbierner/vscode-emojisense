@@ -100,6 +100,16 @@
     "configuration": {
       "title": ":emojisense:",
       "properties": {
+        "emojisense.picker.ignoreSpaces": {
+          "type": "boolean",
+          "markdownDescription": "Remove literal space characters from picker input as you type, so `s mile` is matched as `smile` using VS Code's native filtering. Tabs and other whitespace characters are preserved.",
+          "default": true
+        },
+        "emojisense.picker.searchDescriptions": {
+          "type": "boolean",
+          "markdownDescription": "Show and search human-readable emoji descriptions in both pickers, such as `grinning face with smiling eyes`. Shortcode matching remains enabled.",
+          "default": true
+        },
         "emojisense.picker.preferExactMatch": {
           "type": "boolean",
           "markdownDescription": "Rank exact emoji shortcode matches first and automatically focus them in the picker. Accepts names with or without surrounding colons, such as `smile` or `:smile:`. Other fuzzy matches remain available.",

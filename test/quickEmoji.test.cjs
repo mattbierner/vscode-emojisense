@@ -12,13 +12,13 @@ const code = ts.transpileModule(
 
 // Deliberately put fuzzy matches before prefixes and the exact match.
 const emojis = [
-    { name: 'sweat_smile', emoji: '😅' },
-    { name: 'smile_cat', emoji: '😸' },
-    { name: 'smiley', emoji: '😃' },
-    { name: 'smile', emoji: '😄' },
-    { name: 'cat', emoji: '🐱' },
-    { name: '+1', emoji: '👍' },
-    { name: 'thumbsup', emoji: '👍' },
+    { name: 'sweat_smile', emoji: '😅', description: 'grinning face with sweat' },
+    { name: 'smile_cat', emoji: '😸', description: 'grinning cat with smiling eyes' },
+    { name: 'smiley', emoji: '😃', description: 'grinning face with big eyes' },
+    { name: 'smile', emoji: '😄', description: 'grinning face with smiling eyes' },
+    { name: 'cat', emoji: '🐱', description: 'cat face' },
+    { name: '+1', emoji: '👍', description: 'thumbs up' },
+    { name: 'thumbsup', emoji: '👍', description: 'thumbs up' },
 ];
 const originalNames = emojis.map(emoji => emoji.name);
 
@@ -36,6 +36,8 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
     let onAccept;
     let onHide;
     let items = [];
+    let inputValue = '';
+    let valueUpdates = 0;
     let activeItems = [];
     let itemUpdates = 0;
     let focusUpdates = 0;
@@ -63,6 +65,14 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
         get activeItems() { return activeItems; },
         set activeItems(value) { activeItems = value; focusUpdates++; },
         selectedItems: [],
+        get value() { return inputValue; },
+        set value(value) {
+            if (value !== inputValue) {
+                inputValue = value;
+                valueUpdates++;
+                onChange?.(value);
+            }
+        },
         onDidChangeValue(callback) { onChange = callback; return subscribe(); },
         onDidAccept(callback) { onAccept = callback; return subscribe(); },
         onDidHide(callback) { onHide = callback; return subscribe(); },
@@ -100,6 +110,7 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
         get names() { return picker.items.map(item => item.emoji.name); },
         get itemUpdates() { return itemUpdates; },
         get focusUpdates() { return focusUpdates; },
+        get valueUpdates() { return valueUpdates; },
         get hasChangeHandler() { return !!onChange; },
         get disposed() { return disposed; },
         get activeSubscriptions() { return activeSubscriptions; },
@@ -107,7 +118,7 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
             // Simulate native focus before notifying the extension. Native fuzzy
             // filtering/rendering itself is outside the scope of these tests.
             activeItems = items.slice(0, 1);
-            onChange?.(value);
+            picker.value = value;
         },
         select(name) { activeItems = [items.find(item => item.emoji.name === name)]; },
         async accept() {
@@ -164,6 +175,128 @@ test('both preferences default to enabled', async t => {
     assert.deepEqual(session.names, combinations[3].expected);
 });
 
+test('description search defaults to enabled and exposes descriptions without changing shortcode labels', async t => {
+    const session = openPicker();
+    t.after(() => session.cancel());
+    assert.equal(session.picker.matchOnDetail, true);
+    assert.equal(session.picker.matchOnDescription, true);
+    const smile = session.picker.items.find(item => item.emoji.name === 'smile');
+    assert.equal(smile.label, '😄');
+    assert.equal(smile.description, ':smile:');
+    assert.equal(smile.detail, 'grinning face with smiling eyes');
+});
+
+test('description search can be disabled without disabling shortcode search or ranking', async t => {
+    const session = openPicker({ settings: { 'picker.searchDescriptions': false } });
+    t.after(() => session.cancel());
+    assert.equal(session.picker.matchOnDetail, false);
+    assert.equal(session.picker.matchOnDescription, true);
+    assert(session.picker.items.every(item => item.detail === undefined));
+    session.change('smile');
+    assert.deepEqual(session.names, combinations[3].expected);
+});
+
+test('description search works independently of exact and prefix preferences', async t => {
+    const session = openPicker({ settings: {
+        'picker.preferExactMatch': false, 'picker.preferPrefixMatch': false,
+        'picker.ignoreSpaces': false,
+    } });
+    t.after(() => session.cancel());
+    assert.equal(session.picker.matchOnDetail, true);
+    assert.equal(session.hasChangeHandler, false);
+    assert.deepEqual(session.picker.items.map(item => item.detail), emojis.map(emoji => emoji.description));
+});
+
+test('description queries preserve whitespace when space removal is disabled', async t => {
+    const session = openPicker({ settings: { 'picker.ignoreSpaces': false } });
+    t.after(() => session.cancel());
+    const query = 'grinning face with smiling eyes';
+    session.change(query);
+    assert.equal(session.picker.value, query);
+    assert.deepEqual(session.names, originalNames);
+    assert.equal(session.focusUpdates, 0);
+});
+
+for (const query of ['s mile', 'smi le', ' s m i l e ', ':s mile:']) {
+    test(`removes literal spaces from ${JSON.stringify(query)} and favors its exact shortcode`, async t => {
+        const session = openPicker();
+        t.after(() => session.cancel());
+        session.change(query);
+        assert.equal(session.picker.value, query.replace(/ /g, ''));
+        assert.deepEqual(session.names, combinations[3].expected);
+        assert.equal(session.picker.activeItems[0].emoji.name, 'smile');
+        assert.equal(session.valueUpdates, 2, 'One input event and one normalization; no feedback loop');
+    });
+}
+
+test('space removal works independently of match prioritization', async t => {
+    const session = openPicker({ settings: {
+        'picker.preferExactMatch': false, 'picker.preferPrefixMatch': false,
+    } });
+    t.after(() => session.cancel());
+    session.change('smile  cat');
+    assert.equal(session.picker.value, 'smilecat');
+    assert.deepEqual(session.names, originalNames);
+    assert.equal(session.itemUpdates, 1);
+    assert.equal(session.focusUpdates, 0);
+});
+
+test('space removal can be disabled without changing the input or forcing an exact match', async t => {
+    const session = openPicker({ settings: { 'picker.ignoreSpaces': false } });
+    t.after(() => session.cancel());
+    session.change('s mile');
+    assert.equal(session.picker.value, 's mile');
+    assert.equal(session.valueUpdates, 1);
+    assert.equal(session.focusUpdates, 0);
+});
+
+for (const query of ['s\tmile', 's\u00a0mile']) {
+    test(`space removal leaves other whitespace intact: ${JSON.stringify(query)}`, async t => {
+        const session = openPicker();
+        t.after(() => session.cancel());
+        session.change(query);
+        assert.equal(session.picker.value, query);
+        assert.equal(session.valueUpdates, 1);
+        assert.equal(session.focusUpdates, 0);
+    });
+}
+
+test('space-only input becomes empty without dropping items or updating history', async t => {
+    const session = openPicker();
+    t.after(() => session.cancel());
+    session.change('   ');
+    assert.equal(session.picker.value, '');
+    assert.deepEqual(session.names, originalNames);
+    assert.equal(session.focusUpdates, 0);
+    assert.deepEqual(session.historyState.names, []);
+});
+
+test('description text remains readable when query spaces are removed', async t => {
+    const session = openPicker();
+    t.after(() => session.cancel());
+    session.change('grinning face with smiling eyes');
+    assert.equal(session.picker.value, 'grinningfacewithsmilingeyes');
+    assert.equal(session.picker.matchOnDetail, true);
+    assert.equal(session.picker.items.find(item => item.emoji.name === 'smile').detail, 'grinning face with smiling eyes');
+});
+
+for (const searchDescriptions of [true, false]) {
+    for (const destination of ['editor', 'terminal']) {
+        for (const property of ['emoji', 'name']) {
+            test(`description search=${searchDescriptions} keeps ${property} insertion correct in ${destination}`, async () => {
+                const session = openPicker({ property, destination, settings: { 'picker.searchDescriptions': searchDescriptions } });
+                session.change(searchDescriptions ? 'grinning face with smiling eyes' : 'smile');
+                session.select('smile');
+                await session.accept();
+                const text = property === 'emoji' ? '😄' : ':smile:';
+                assert.deepEqual(session.insertions, destination === 'editor' ? [text] : []);
+                assert.deepEqual(session.terminalWrites, destination === 'terminal' ? [{ text, addNewLine: false }] : []);
+                assert.deepEqual(session.historyState.names, ['smile']);
+            });
+        }
+    }
+}
+
 for (const query of ['smile', ':smile:', ':smile', 'smile:', 'SMILE', '  :SMILE:  ']) {
     test(`normalizes ${JSON.stringify(query)} without dropping other candidates`, async t => {
         const session = openPicker();
@@ -190,9 +323,10 @@ test('exact-only mode does not promote prefixes', async t => {
     assert.equal(session.focusUpdates, 0);
 });
 
-test('both off preserves original presentation, list identity, and native focus', async t => {
+test('all input preferences off preserves original presentation, list identity, and native focus', async t => {
     const session = openPicker({ settings: {
         'picker.preferExactMatch': false, 'picker.preferPrefixMatch': false,
+        'picker.ignoreSpaces': false,
     } });
     t.after(() => session.cancel());
     const initialItems = session.picker.items;
@@ -318,6 +452,7 @@ test('match preferences take priority over history and clearing input restores r
 test('history remains shared when both match preferences are disabled', async t => {
     const session = openPicker({ historyState: createHistoryState(['cat']), settings: {
         'picker.preferExactMatch': false, 'picker.preferPrefixMatch': false,
+        'picker.ignoreSpaces': false,
     } });
     t.after(() => session.cancel());
     assert.equal(session.names[0], 'cat');
@@ -326,7 +461,7 @@ test('history remains shared when both match preferences are disabled', async t 
 });
 
 test('history is bounded, ignores removed shortcodes, and does not duplicate candidates', async () => {
-    const dataset = Array.from({ length: 205 }, (_, i) => ({ name: `emoji_${i}`, emoji: '😄' }));
+    const dataset = Array.from({ length: 205 }, (_, i) => ({ name: `emoji_${i}`, emoji: '😄', description: `Emoji ${i}` }));
     const historyState = createHistoryState(['removed', 'emoji_0', 'emoji_0', ...dataset.map(item => item.name)]);
     const session = openPicker({ dataset, historyState });
     assert.equal(session.names.length, dataset.length);
@@ -418,7 +553,7 @@ test('all real emoji aliases remain unique and available across ranking transiti
     const byName = new Map();
     for (const record of gemoji) {
         for (const name of record.names) {
-            if (!byName.has(name)) byName.set(name, { name, emoji: record.emoji });
+            if (!byName.has(name)) byName.set(name, { name, emoji: record.emoji, description: record.description });
         }
     }
     const dataset = [...byName.values()];

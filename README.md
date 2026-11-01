@@ -21,9 +21,13 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 
 ## General Configuration
 
+- `emojisense.picker.ignoreSpaces`: Remove literal space characters from input as you type in either picker (for example, `s mile` becomes `smile`). Enabled by default. VS Code's native filtering searches the resulting text. Tabs and other whitespace characters are preserved. Set this to `false` to keep spaces in your queries, including description phrases.
+
+- `emojisense.picker.searchDescriptions`: Show and search human-readable descriptions in both pickers (for example, `grinning face with smiling eyes`). Enabled by default. Displayed descriptions retain their spaces. Set this to `false` to hide descriptions and search emoji and shortcodes only. Exact and prefix preferences continue to apply to shortcode names.
+
 - `emojisense.picker.preferExactMatch`: Rank exact shortcode matches first and automatically focus them in the emoji picker, so Enter selects them. Enabled by default. Names are matched without case sensitivity, with or without surrounding colons (for example, `smile` or `:smile:`). Other fuzzy matches remain available, and you can use the arrow keys to select another result.
 
-- `emojisense.picker.preferPrefixMatch`: Rank shortcode prefixes ahead of other fuzzy matches. Enabled by default. For example, `smile` ranks the single exact match `smile` first, then `smile_cat`, then fuzzy matches such as `sweat_smile`. Set both picker preferences to `false` to disable match prioritization, with no custom input handler. Shared recent history still appears first.
+- `emojisense.picker.preferPrefixMatch`: Rank shortcode prefixes ahead of other fuzzy matches. Enabled by default. For example, `smile` ranks the single exact match `smile` first, then `smile_cat`, then fuzzy matches such as `sweat_smile`. Set both match preferences to `false` to disable prioritization. Set `ignoreSpaces` to `false` too to avoid a custom input handler. Shared recent history still appears first.
 
 - `emojisense.unicodeCompletionsEnabled`: Enable completions that insert emoji as unicode, i.e. `:smile_cat:` -> 😸
 

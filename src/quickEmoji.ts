@@ -38,6 +38,8 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
             const config = workspace.getConfiguration('emojisense', window.activeTextEditor?.document.uri);
             const preferExactMatch = config.get<boolean>('picker.preferExactMatch', true);
             const preferPrefixMatch = config.get<boolean>('picker.preferPrefixMatch', true);
+            const searchDescriptions = config.get<boolean>('picker.searchDescriptions', true);
+            const ignoreSpaces = config.get<boolean>('picker.ignoreSpaces', true);
             const recent = new Set(recentItems());
             const orderedItems = recent.size
                 ? [...recent, ...items.filter(item => !recent.has(item))]
@@ -48,17 +50,29 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
             let selectedItem: EmojiQuickPickItem | undefined;
             try {
                 selectedItem = await new Promise<EmojiQuickPickItem | undefined>((resolve) => {
-                    const rankedItems = preferExactMatch || preferPrefixMatch
-                        ? orderedItems.map(item => ({ ...item, description: `:${item.emoji.name}:` }))
+                    const rankedItems = preferExactMatch || preferPrefixMatch || searchDescriptions
+                        ? orderedItems.map(item => ({
+                            ...item,
+                            description: preferExactMatch || preferPrefixMatch ? `:${item.emoji.name}:` : item.description,
+                            detail: searchDescriptions ? item.emoji.description : undefined,
+                        }))
                         : orderedItems;
                     picker.items = rankedItems;
                     let displayedItems = rankedItems;
                     picker.matchOnDescription = true;
+                    picker.matchOnDetail = searchDescriptions;
                     picker.placeholder = 'Your Emoji Code';
                     picker.title = property === 'emoji' ? 'Emoji Picker' : 'Emoji Code Picker';
-                    if (preferExactMatch || preferPrefixMatch) {
+                    if (preferExactMatch || preferPrefixMatch || ignoreSpaces) {
                         disposables.push(picker.onDidChangeValue(value => {
-                            const name = value.trim().replace(/^:|:$/g, '').toLowerCase();
+                            const query = ignoreSpaces ? value.replace(/ /g, '') : value;
+                            if (query !== value) {
+                                picker.value = query;
+                            }
+                            if (!preferExactMatch && !preferPrefixMatch) {
+                                return;
+                            }
+                            const name = query.trim().replace(/^:|:$/g, '').toLowerCase();
                             let exactMatch: EmojiQuickPickItem | undefined;
                             const prefixMatches: EmojiQuickPickItem[] = [];
                             const otherItems: EmojiQuickPickItem[] = [];

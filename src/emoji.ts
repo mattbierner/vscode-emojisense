@@ -3,6 +3,7 @@ import { gemoji } from 'gemoji';
 export interface Emoji {
     readonly name: string;
     readonly emoji: string;
+    readonly description: string;
 }
 
 export class EmojiProvider {
@@ -26,7 +27,7 @@ export class EmojiProvider {
             for (const g of gemoji) {
                 for (const name of g.names) {
                     if (!this._emojiMap.has(name)) {
-                        this._emojiMap.set(name, { name, emoji: g.emoji });
+                        this._emojiMap.set(name, { name, emoji: g.emoji, description: g.description });
                     }
                 }
             }
