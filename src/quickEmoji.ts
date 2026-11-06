@@ -1,4 +1,4 @@
-import { commands, Disposable, Memento, QuickPickItem, ThemeIcon, window, workspace } from 'vscode';
+import { commands, Disposable, env, Memento, QuickPickItem, ThemeIcon, window, workspace } from 'vscode';
 import { Emoji, EmojiProvider } from './emoji';
 
 export type EmojiDestination = 'terminal' | 'editor';
@@ -35,6 +35,8 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
     return (property: keyof Emoji, destination: EmojiDestination) => {
         return async () => {
             let insertionProperty = property;
+            const textFor = (item: EmojiQuickPickItem) => insertionProperty === 'name'
+                ? `:${item.emoji.name}:` : item.emoji.emoji;
             const config = workspace.getConfiguration('emojisense', window.activeTextEditor?.document.uri);
             const preferExactMatch = config.get<boolean>('picker.preferExactMatch', true);
             const preferPrefixMatch = config.get<boolean>('picker.preferPrefixMatch', true);
@@ -50,13 +52,27 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
             let selectedItem: EmojiQuickPickItem | undefined;
             try {
                 selectedItem = await new Promise<EmojiQuickPickItem | undefined>((resolve) => {
+                    const copy = { iconPath: new ThemeIcon('copy'), tooltip: 'Copy in current insertion mode' };
                     const rankedItems: EmojiQuickPickItem[] = orderedItems.map(item => ({
                         ...item,
                         description: preferExactMatch || preferPrefixMatch ? `:${item.emoji.name}:` : item.description,
                         detail: searchDescriptions ? item.emoji.description : undefined,
+                        buttons: [copy],
                     }));
                     picker.items = rankedItems;
                     let displayedItems = rankedItems;
+                    let copyFeedbackDisposed = false;
+                    const copyFeedbackTimers = new Map<EmojiQuickPickItem, ReturnType<typeof setTimeout>>();
+                    disposables.push({ dispose: () => {
+                        copyFeedbackDisposed = true;
+                        copyFeedbackTimers.forEach(timer => clearTimeout(timer));
+                        copyFeedbackTimers.clear();
+                    } });
+                    const refreshItems = () => {
+                        const activeItems = picker.activeItems;
+                        picker.items = displayedItems;
+                        picker.activeItems = activeItems;
+                    };
                     picker.matchOnDescription = true;
                     picker.matchOnDetail = searchDescriptions;
                     picker.placeholder = 'Your Emoji Code';
@@ -76,7 +92,39 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
                         updateControls();
                     };
                     updateControls();
+                    const copyItem = async (item: EmojiQuickPickItem | undefined) => {
+                        if (!item) {
+                            return;
+                        }
+                        try {
+                            const text = textFor(item);
+                            await env.clipboard.writeText(text);
+                            if (copyFeedbackDisposed) {
+                                return;
+                            }
+                            clearTimeout(copyFeedbackTimers.get(item));
+                            item.buttons = [{ iconPath: new ThemeIcon('check'), tooltip: `Copied ${text}` }];
+                            refreshItems();
+                            copyFeedbackTimers.set(item, setTimeout(() => {
+                                copyFeedbackTimers.delete(item);
+                                item.buttons = [copy];
+                                refreshItems();
+                            }, 1000));
+                        } catch (error) {
+                            console.warn('Emojisense: Could not copy picker selection.', error);
+                            if (!copyFeedbackDisposed) {
+                                void window.showWarningMessage('Could not copy emoji. Please try again.');
+                            }
+                        }
+                    };
+                    const copySelection = () => copyItem(picker.activeItems[0]);
                     disposables.push(commands.registerCommand('emojisense.togglePickerInsertionMode', toggleInsertionMode));
+                    disposables.push(commands.registerCommand('emojisense.copyPickerSelection', copySelection));
+                    disposables.push(picker.onDidTriggerItemButton(event => {
+                        if (event.button === event.item.buttons?.[0]) {
+                            return copyItem(event.item);
+                        }
+                    }));
                     disposables.push(picker.onDidTriggerButton(button => {
                         if (button === useShortcode || button === useEmoji) {
                             toggleInsertionMode();
@@ -154,7 +202,7 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
                 return;
             }
 
-            const insert = insertionProperty === 'name' ? `:${selectedItem.emoji.name}:` : selectedItem.emoji.emoji;
+            const insert = textFor(selectedItem);
             switch (destination) {
                 case 'terminal':
                     if (window.activeTerminal) {

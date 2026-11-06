@@ -36,6 +36,7 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
     let onAccept;
     let onHide;
     let onButton;
+    let onItemButton;
     let items = [];
     let inputValue = '';
     let valueUpdates = 0;
@@ -46,10 +47,14 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
     let activeSubscriptions = 0;
     const insertions = [];
     const terminalWrites = [];
+    const clipboardWrites = [];
     const commands = [];
     const commandHandlers = new Map();
     const contexts = new Map();
     const warnings = [];
+    const messages = [];
+    const copyFeedbackTimers = new Map();
+    let timerId = 0;
     const subscribe = () => {
         activeSubscriptions++;
         let disposed = false;
@@ -80,16 +85,19 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
         onDidAccept(callback) { onAccept = callback; return subscribe(); },
         onDidHide(callback) { onHide = callback; return subscribe(); },
         onDidTriggerButton(callback) { onButton = callback; return subscribe(); },
+        onDidTriggerItemButton(callback) { onItemButton = callback; return subscribe(); },
         show() { if (showError) throw showError; },
         hide() { onHide(); },
         dispose() { disposed = true; },
     };
     const api = {
         ThemeIcon: class { constructor(id) { this.id = id; } },
+        env: { clipboard: { writeText: async text => { clipboardWrites.push(text); } } },
         workspace: {
             getConfiguration: () => ({ get: (key, fallback) => settings[key] ?? fallback }),
         },
         window: {
+            showWarningMessage: async message => { messages.push(message); },
             createQuickPick: () => picker,
             activeTextEditor: {
                 document: { uri: {} },
@@ -120,14 +128,24 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
         },
     };
     const exports = {};
-    new Function('require', 'exports', 'console', code)(name => {
+    new Function('require', 'exports', 'console', 'setTimeout', 'clearTimeout', code)(name => {
         assert.equal(name, 'vscode');
         return api;
-    }, exports, { warn: (...args) => warnings.push(args) });
+    }, exports, { warn: (...args) => warnings.push(args) }, (callback, delay) => {
+        const id = ++timerId;
+        copyFeedbackTimers.set(id, { callback, delay });
+        return id;
+    }, id => copyFeedbackTimers.delete(id));
     const done = exports.quickEmoji({ emojis: dataset }, historyState)(property, destination)();
 
     return {
-        picker, done, api, insertions, terminalWrites, commands, commandHandlers, contexts, historyState, warnings,
+        picker, done, api, insertions, terminalWrites, clipboardWrites, commands, commandHandlers, contexts, historyState, warnings, messages, copyFeedbackTimers,
+        resetCopyFeedback() {
+            for (const [id, { callback }] of [...copyFeedbackTimers]) {
+                copyFeedbackTimers.delete(id);
+                callback();
+            }
+        },
         get names() { return picker.items.map(item => item.emoji.name); },
         get itemUpdates() { return itemUpdates; },
         get focusUpdates() { return focusUpdates; },
@@ -144,6 +162,9 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
         select(name) { activeItems = [items.find(item => item.emoji.name === name)]; },
         toggleDescriptions() { onButton(picker.buttons[0]); },
         toggleInsertionMode() { onButton(picker.buttons[1]); },
+        copySelection(item = picker.activeItems[0]) {
+            if (item) return onItemButton({ item, button: item.buttons[0] });
+        },
         async accept() {
             picker.selectedItems = activeItems;
             onAccept();
@@ -171,6 +192,167 @@ const combinations = [
         focused: 'smile',
     },
 ];
+
+for (const property of ['emoji', 'name']) {
+    for (const via of ['button', 'command']) {
+        test(`copy via ${via} uses active item and current ${property} mode without closing or inserting`, async () => {
+            const historyState = createHistoryState(['cat']);
+            const session = openPicker({ property, historyState, destination: 'terminal' });
+            session.change('smile');
+            session.select('smile_cat');
+            // Single-select QuickPick uses activeItems for the highlighted row;
+            // selectedItems need not track it until the user accepts.
+            session.picker.selectedItems = [session.picker.items.find(item => item.emoji.name === 'cat')];
+            const active = session.picker.activeItems[0];
+            const order = session.names;
+            const itemUpdates = session.itemUpdates;
+            const copy = () => via === 'button' ? session.copySelection()
+                : session.api.commands.executeCommand('emojisense.copyPickerSelection');
+            assert.equal(active.buttons[0].iconPath.id, 'copy');
+            assert.equal(session.picker.buttons.length, 2);
+            await copy();
+            assert.equal(active.buttons[0].iconPath.id, 'check');
+            assert.equal(active.buttons[0].tooltip, property === 'emoji' ? 'Copied 😸' : 'Copied :smile_cat:');
+            session.toggleInsertionMode();
+            session.toggleDescriptions();
+            await copy();
+            assert.equal(active.buttons[0].tooltip, property === 'emoji' ? 'Copied :smile_cat:' : 'Copied 😸');
+            assert.deepEqual(session.clipboardWrites,
+                property === 'emoji' ? ['😸', ':smile_cat:'] : [':smile_cat:', '😸']);
+            assert.equal(session.picker.activeItems[0], active);
+            assert.equal(session.picker.value, 'smile');
+            assert.deepEqual(session.names, order);
+            assert.equal(session.itemUpdates, itemUpdates + 3); // Two copy confirmations and the description toggle.
+            assert.deepEqual(session.insertions, []);
+            assert.deepEqual(session.terminalWrites, []);
+            assert.deepEqual(session.commands, []);
+            assert.deepEqual(historyState.names, ['cat']);
+            assert.equal(session.disposed, false);
+            await session.cancel();
+            assert.equal(session.copyFeedbackTimers.size, 0);
+            assert.equal(session.commandHandlers.size, 0);
+            assert.equal(session.activeSubscriptions, 0);
+            assert.equal(session.contexts.get('emojisense.pickerOpen'), false);
+        });
+    }
+}
+
+test('copy with no active item leaves the clipboard untouched', async () => {
+    const session = openPicker();
+    session.picker.activeItems = [];
+    await session.copySelection();
+    await session.api.commands.executeCommand('emojisense.copyPickerSelection');
+    assert.deepEqual(session.clipboardWrites, []);
+    assert.equal(session.disposed, false);
+    await session.cancel();
+});
+
+test('copy confirmation restores the icon after one second without changing query or focus', async () => {
+    const session = openPicker();
+    session.change('smile');
+    session.select('smile_cat');
+    const active = session.picker.activeItems[0];
+    const order = session.names;
+    await session.copySelection();
+    assert.equal(active.buttons[0].iconPath.id, 'check');
+    assert.equal([...session.copyFeedbackTimers.values()][0].delay, 1000);
+    session.resetCopyFeedback();
+    assert.equal(active.buttons[0].iconPath.id, 'copy');
+    assert.equal(session.picker.activeItems[0], active);
+    assert.deepEqual(session.names, order);
+    assert.equal(session.picker.value, 'smile');
+    assert.deepEqual(session.historyState.names, []);
+    await session.cancel();
+});
+
+test('repeated copying renews confirmation and different rows reset independently', async () => {
+    const session = openPicker();
+    const first = session.picker.activeItems[0];
+    await session.copySelection();
+    const initialTimer = [...session.copyFeedbackTimers.keys()][0];
+    await session.copySelection(); // Checkmark remains clickable.
+    assert.equal(session.copyFeedbackTimers.size, 1);
+    assert.equal(session.copyFeedbackTimers.has(initialTimer), false);
+    session.select('cat');
+    const second = session.picker.activeItems[0];
+    await session.api.commands.executeCommand('emojisense.copyPickerSelection');
+    assert.equal(first.buttons[0].iconPath.id, 'check');
+    assert.equal(second.buttons[0].iconPath.id, 'check');
+    assert.equal(session.copyFeedbackTimers.size, 2);
+    session.resetCopyFeedback();
+    assert.equal(first.buttons[0].iconPath.id, 'copy');
+    assert.equal(second.buttons[0].iconPath.id, 'copy');
+    assert.equal(session.picker.activeItems[0], second);
+    await session.cancel();
+});
+
+test('a clipboard write completing after cancellation does not update the closed picker', async () => {
+    const session = openPicker();
+    let finishCopy;
+    session.api.env.clipboard.writeText = () => new Promise(resolve => { finishCopy = resolve; });
+    const copying = session.copySelection();
+    await session.cancel();
+    const updates = session.itemUpdates;
+    finishCopy();
+    await copying;
+    assert.equal(session.copyFeedbackTimers.size, 0);
+    assert.equal(session.itemUpdates, updates);
+});
+
+test('row copy copies the clicked item even when another item is highlighted', async () => {
+    const session = openPicker({ property: 'name' });
+    session.change('smile');
+    const active = session.picker.activeItems[0];
+    const hovered = session.picker.items.find(item => item.emoji.name === 'smile_cat');
+    await session.copySelection(hovered);
+    assert.deepEqual(session.clipboardWrites, [':smile_cat:']);
+    assert.equal(session.picker.activeItems[0], active);
+    assert.equal(session.disposed, false);
+    assert.deepEqual(session.historyState.names, []);
+    await session.cancel();
+});
+
+test('copy keeps the selected alias and does not interfere with subsequent editor insertion', async () => {
+    const session = openPicker({ property: 'name' });
+    session.select('thumbsup');
+    await session.copySelection();
+    assert.deepEqual(session.clipboardWrites, [':thumbsup:']);
+    assert.deepEqual(session.historyState.names, []);
+    await session.accept();
+    assert.deepEqual(session.insertions, [':thumbsup:']);
+    assert.deepEqual(session.historyState.names, ['thumbsup']);
+});
+
+test('a clipboard failure keeps the picker usable and allows another copy', async () => {
+    const session = openPicker();
+    const error = new Error('Clipboard unavailable');
+    session.api.env.clipboard.writeText = async () => { throw error; };
+    session.change('smile');
+    await session.copySelection();
+    assert.equal(session.warnings.length, 1);
+    assert.equal(session.warnings[0][1], error);
+    assert.deepEqual(session.messages, ['Could not copy emoji. Please try again.']);
+    assert.equal(session.picker.activeItems[0].buttons[0].iconPath.id, 'copy');
+    assert.equal(session.copyFeedbackTimers.size, 0);
+    assert.equal(session.disposed, false);
+    assert.deepEqual(session.historyState.names, []);
+    session.api.env.clipboard.writeText = async text => { session.clipboardWrites.push(text); };
+    await session.api.commands.executeCommand('emojisense.copyPickerSelection');
+    assert.deepEqual(session.clipboardWrites, ['😄']);
+    await session.accept();
+    assert.deepEqual(session.insertions, ['😄']);
+});
+
+test('copy keybinding is restricted to the open emoji picker on all platforms', () => {
+    const { contributes } = require('../package.json');
+    const command = 'emojisense.copyPickerSelection';
+    const binding = contributes.keybindings.find(binding => binding.command === command);
+    assert.equal(binding.when, 'emojisense.pickerOpen && inQuickOpen');
+    assert.equal(binding.mac, 'cmd+c');
+    assert.equal(binding.key, 'ctrl+c');
+    assert.equal(contributes.commands.find(entry => entry.command === command).enablement, 'emojisense.pickerOpen');
+    assert.equal(contributes.menus.commandPalette.find(entry => entry.command === command).when, 'false');
+});
 
 for (const property of ['emoji', 'name']) {
     for (const destination of ['editor', 'terminal']) {

@@ -37,6 +37,12 @@
   "contributes": {
     "commands": [
       {
+        "command": "emojisense.copyPickerSelection",
+        "title": "Copy selected emoji / :shortcode:",
+        "category": "Emojisense",
+        "enablement": "emojisense.pickerOpen"
+      },
+      {
         "command": "emojisense.togglePickerInsertionMode",
         "title": "Toggle emoji / :shortcode: insertion",
         "category": "Emojisense",
@@ -66,6 +72,10 @@
     "menus": {
       "commandPalette": [
         {
+          "command": "emojisense.copyPickerSelection",
+          "when": "false"
+        },
+        {
           "command": "emojisense.togglePickerInsertionMode",
           "when": "false"
         },
@@ -80,6 +90,12 @@
       ]
     },
     "keybindings": [
+      {
+        "mac": "cmd+c",
+        "key": "ctrl+c",
+        "command": "emojisense.copyPickerSelection",
+        "when": "emojisense.pickerOpen && inQuickOpen"
+      },
       {
         "mac": "shift+cmd+i",
         "key": "shift+ctrl+i",
