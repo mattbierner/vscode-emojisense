@@ -24,7 +24,7 @@ Inspired by the [Atom autocomplete+ emojis suggestions plugin][atom].
 
 ## General Configuration
 
-- `emojisense.picker.ignoreSpaces`: Remove literal space characters from input as you type in either picker (for example, `s mile` becomes `smile`). Enabled by default. VS Code's native filtering searches the resulting text. Tabs and other whitespace characters are preserved. Set this to `false` to keep spaces in your queries, including description phrases.
+- `emojisense.picker.ignoreSpaces`: Ignore literal space characters when matching in either picker (for example, `s mile` matches `smile`), while preserving the text you type. Enabled by default. Tabs and other whitespace characters are not ignored. Set this to `false` to use native filtering alone. Native matches keep their highlighting; additional matches found by ignoring spaces may have no blue highlighting.
 
 - `emojisense.picker.searchDescriptions`: Show and search human-readable descriptions and tags in both pickers (for example, `grinning face with big eyes · #happy #joy #haha`). Type `#happy` to match tags using native filtering, or `happy` for a broader search. Enabled by default. Displayed descriptions retain their spaces. Set this to `false` to hide descriptions and search emoji and shortcodes only. Use the description toggle in an open picker to show or hide descriptions and toggle description matching immediately; this affects only that picker, and the setting controls the default for the next opening.
 

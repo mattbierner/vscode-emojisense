@@ -135,7 +135,7 @@
       "properties": {
         "emojisense.picker.ignoreSpaces": {
           "type": "boolean",
-          "markdownDescription": "Remove literal space characters from picker input as you type, so `s mile` is matched as `smile` using VS Code's native filtering. Tabs and other whitespace characters are preserved.",
+          "markdownDescription": "Ignore literal space characters when matching picker input, so `s mile` matches `smile` while the typed spaces remain visible. Tabs and other whitespace characters are not ignored.",
           "default": true
         },
         "emojisense.picker.searchDescriptions": {

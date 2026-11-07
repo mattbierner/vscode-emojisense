@@ -21,6 +21,8 @@ const emojis = [
     { name: 'thumbsup', emoji: '👍', description: 'thumbs up' },
 ];
 const originalNames = emojis.map(emoji => emoji.name);
+const matching = {};
+new Function('exports', ts.transpileModule(fs.readFileSync(path.join(__dirname, '../src/pickerMatching.ts'), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2018 } }).outputText)(matching);
 
 function createHistoryState(initial = []) {
     const values = new Map([['picker.history', [...initial]]]);
@@ -129,6 +131,7 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
     };
     const exports = {};
     new Function('require', 'exports', 'console', 'setTimeout', 'clearTimeout', code)(name => {
+        if (name === './pickerMatching') return matching;
         assert.equal(name, 'vscode');
         return api;
     }, exports, { warn: (...args) => warnings.push(args) }, (callback, delay) => {
@@ -616,7 +619,7 @@ test('description search works independently of exact and prefix preferences', a
     assert.deepEqual(session.picker.items.map(item => item.detail), emojis.map(emoji => emoji.description));
 });
 
-test('description queries preserve whitespace when space removal is disabled', async t => {
+test('description queries preserve whitespace when space ignoring is disabled', async t => {
     const session = openPicker({ settings: { 'picker.ignoreSpaces': false } });
     t.after(() => session.cancel());
     const query = 'grinning face with smiling eyes';
@@ -627,40 +630,69 @@ test('description queries preserve whitespace when space removal is disabled', a
 });
 
 for (const query of ['s mile', 'smi le', ' s m i l e ', ':s mile:']) {
-    test(`removes literal spaces from ${JSON.stringify(query)} and favors its exact shortcode`, async t => {
+    test(`ignores literal spaces in ${JSON.stringify(query)} without editing input and favors its exact shortcode`, async t => {
         const session = openPicker();
         t.after(() => session.cancel());
         session.change(query);
-        assert.equal(session.picker.value, query.replace(/ /g, ''));
+        assert.equal(session.picker.value, query);
         assert.deepEqual(session.names, combinations[3].expected);
         assert.equal(session.picker.activeItems[0].emoji.name, 'smile');
-        assert.equal(session.valueUpdates, 2, 'One input event and one normalization; no feedback loop');
+        assert.equal(session.valueUpdates, 1, 'Typing must not rewrite the input');
     });
 }
 
-test('space removal works independently of match prioritization', async t => {
+test('space ignoring works independently of match prioritization', async t => {
     const session = openPicker({ settings: {
         'picker.preferExactMatch': false, 'picker.preferPrefixMatch': false,
     } });
     t.after(() => session.cancel());
     session.change('smile  cat');
-    assert.equal(session.picker.value, 'smilecat');
+    assert.equal(session.picker.value, 'smile  cat');
     assert.deepEqual(session.names, originalNames);
-    assert.equal(session.itemUpdates, 1);
-    assert.equal(session.focusUpdates, 0);
+    assert.equal(session.picker.items.find(item => item.emoji.name === 'smile_cat').alwaysShow, true);
+    assert.equal(session.picker.items.find(item => item.emoji.name === 'cat').alwaysShow, undefined);
 });
 
-test('space removal can be disabled without changing the input or forcing an exact match', async t => {
+test('space ignoring can be disabled without changing the input or forcing an exact match', async t => {
     const session = openPicker({ settings: { 'picker.ignoreSpaces': false } });
     t.after(() => session.cancel());
     session.change('s mile');
     assert.equal(session.picker.value, 's mile');
     assert.equal(session.valueUpdates, 1);
     assert.equal(session.focusUpdates, 0);
+    assert(session.picker.items.every(item => !item.alwaysShow));
+});
+
+test('space fallback preserves compact fuzzy matches and resets when spaces disappear', async t => {
+    const session = openPicker();
+    t.after(() => session.cancel());
+    session.change('smile cat');
+    assert.equal(session.picker.value, 'smile cat');
+    assert.equal(session.picker.items.find(item => item.emoji.name === 'smile_cat').alwaysShow, true);
+    assert(session.picker.items.filter(item => item.alwaysShow).every(item => item.emoji.name === 'smile_cat'));
+    session.change('smilecat');
+    assert(session.picker.items.every(item => !item.alwaysShow));
+    session.change('s _s');
+    assert(session.picker.items.every(item => !item.alwaysShow)); // No arbitrary subsequence matching.
+});
+
+test('space fallback respects the description/tag search toggle and preserves input', async t => {
+    const session = openPicker({ dataset: [{
+        name: 'dog', emoji: '🐶', description: 'dog face', tags: ['pet'],
+    }] });
+    t.after(() => session.cancel());
+    session.change('#p et');
+    assert.equal(session.picker.value, '#p et');
+    assert.equal(session.picker.items[0].alwaysShow, true);
+    session.toggleDescriptions();
+    assert.equal(session.picker.items[0].alwaysShow, false);
+    session.toggleDescriptions();
+    assert.equal(session.picker.items[0].alwaysShow, true);
+    assert.equal(session.picker.value, '#p et');
 });
 
 for (const query of ['s\tmile', 's\u00a0mile']) {
-    test(`space removal leaves other whitespace intact: ${JSON.stringify(query)}`, async t => {
+    test(`space ignoring leaves other whitespace intact: ${JSON.stringify(query)}`, async t => {
         const session = openPicker();
         t.after(() => session.cancel());
         session.change(query);
@@ -670,21 +702,20 @@ for (const query of ['s\tmile', 's\u00a0mile']) {
     });
 }
 
-test('space-only input becomes empty without dropping items or updating history', async t => {
+test('space-only input stays visible without dropping items or updating history', async t => {
     const session = openPicker();
     t.after(() => session.cancel());
     session.change('   ');
-    assert.equal(session.picker.value, '');
+    assert.equal(session.picker.value, '   ');
     assert.deepEqual(session.names, originalNames);
-    assert.equal(session.focusUpdates, 0);
     assert.deepEqual(session.historyState.names, []);
 });
 
-test('description text remains readable when query spaces are removed', async t => {
+test('description text and input stay readable when spaces are ignored', async t => {
     const session = openPicker();
     t.after(() => session.cancel());
     session.change('grinning face with smiling eyes');
-    assert.equal(session.picker.value, 'grinningfacewithsmilingeyes');
+    assert.equal(session.picker.value, 'grinning face with smiling eyes');
     assert.equal(session.picker.matchOnDetail, true);
     assert.equal(session.picker.items.find(item => item.emoji.name === 'smile').detail, 'grinning face with smiling eyes');
 });

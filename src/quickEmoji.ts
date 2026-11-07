@@ -1,5 +1,6 @@
 import { commands, Disposable, env, Memento, QuickPickItem, ThemeIcon, window, workspace } from 'vscode';
 import { Emoji, EmojiProvider } from './emoji';
+import { matchesPickerQuery } from './pickerMatching';
 
 export type EmojiDestination = 'terminal' | 'editor';
 
@@ -77,6 +78,21 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
                         picker.items = displayedItems;
                         picker.activeItems = activeItems;
                     };
+                    const updateSpaceMatches = () => {
+                        const value = picker.value;
+                        const normalized = value.replace(/ /g, '');
+                        const needsFallback = ignoreSpaces && normalized !== value;
+                        let changed = false;
+                        for (const item of rankedItems) {
+                            const alwaysShow = needsFallback && [item.label, item.description || '', item.detail || '']
+                                .some(text => matchesPickerQuery(normalized, text));
+                            if (!!item.alwaysShow !== alwaysShow) {
+                                item.alwaysShow = alwaysShow;
+                                changed = true;
+                            }
+                        }
+                        return changed;
+                    };
                     picker.matchOnDescription = true;
                     picker.matchOnDetail = searchDescriptions;
                     picker.placeholder = 'Your Emoji Code';
@@ -143,6 +159,7 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
                         }
                         const activeItems = picker.activeItems;
                         picker.matchOnDetail = searchDescriptions;
+                        updateSpaceMatches();
                         picker.items = displayedItems;
                         picker.activeItems = activeItems;
                         updateControls();
@@ -150,10 +167,11 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
                     if (preferExactMatch || preferPrefixMatch || ignoreSpaces) {
                         disposables.push(picker.onDidChangeValue(value => {
                             const query = ignoreSpaces ? value.replace(/ /g, '') : value;
-                            if (query !== value) {
-                                picker.value = query;
-                            }
+                            const spaceMatchesChanged = updateSpaceMatches();
                             if (!preferExactMatch && !preferPrefixMatch) {
+                                if (spaceMatchesChanged) {
+                                    refreshItems();
+                                }
                                 return;
                             }
                             const name = query.trim().replace(/^:|:$/g, '').toLowerCase();
@@ -177,7 +195,7 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
                             const nextItems = exactMatch
                                 ? [exactMatch, ...prefixMatches, ...otherItems]
                                 : [...prefixMatches, ...otherItems];
-                            if (nextItems.some((item, index) => item !== displayedItems[index])) {
+                            if (spaceMatchesChanged || nextItems.some((item, index) => item !== displayedItems[index])) {
                                 picker.items = nextItems;
                                 displayedItems = nextItems;
                             }
