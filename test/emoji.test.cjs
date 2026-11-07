@@ -22,6 +22,8 @@ test('emoji aliases retain their human-readable descriptions from gemoji', async
         assert.equal(emoji.name, name);
         assert.equal(emoji.emoji, thumbsUp.emoji);
         assert.equal(emoji.description, thumbsUp.description);
+        assert.deepEqual(emoji.tags, thumbsUp.tags);
     }
     assert(provider.emojis.every(emoji => typeof emoji.description === 'string' && emoji.description.length > 0));
+    assert(provider.emojis.every(emoji => Array.isArray(emoji.tags)));
 });

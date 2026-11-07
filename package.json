@@ -140,7 +140,7 @@
         },
         "emojisense.picker.searchDescriptions": {
           "type": "boolean",
-          "markdownDescription": "Show and search human-readable emoji descriptions in both pickers, such as `grinning face with smiling eyes`. Shortcode matching remains enabled.",
+          "markdownDescription": "Show and search human-readable emoji descriptions and #tags in both pickers, such as `grinning face with big eyes · #happy #joy #haha`. Shortcode matching remains enabled.",
           "default": true
         },
         "emojisense.picker.preferExactMatch": {

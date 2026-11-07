@@ -136,7 +136,7 @@ function openPicker({ settings = {}, property = 'emoji', destination = 'editor',
         copyFeedbackTimers.set(id, { callback, delay });
         return id;
     }, id => copyFeedbackTimers.delete(id));
-    const done = exports.quickEmoji({ emojis: dataset }, historyState)(property, destination)();
+    const done = exports.quickEmoji({ emojis: dataset.map(emoji => ({ tags: [], ...emoji })) }, historyState)(property, destination)();
 
     return {
         picker, done, api, insertions, terminalWrites, clipboardWrites, commands, commandHandlers, contexts, historyState, warnings, messages, copyFeedbackTimers,
@@ -192,6 +192,48 @@ const combinations = [
         focused: 'smile',
     },
 ];
+
+test('tags are appended to readable descriptions for native hashtag filtering', async () => {
+    const session = openPicker({ dataset: [{
+        name: 'smiley', emoji: '😃', description: 'grinning face with big eyes', tags: ['happy', 'joy', 'haha'],
+    }] });
+    const item = session.picker.items[0];
+    assert.equal(item.detail, 'grinning face with big eyes · #happy #joy #haha');
+    assert.equal(item.label, '😃');
+    assert.equal(item.description, ':smiley:');
+    assert.equal(session.picker.matchOnDetail, true);
+    const originalItems = session.picker.items;
+    session.change('#happy');
+    assert.equal(session.picker.value, '#happy');
+    assert.equal(session.picker.items, originalItems);
+    assert.equal(session.picker.title, '😃 Emoji Picker');
+    assert.equal(session.picker.buttons.length, 2);
+    assert.equal(item.detail, 'grinning face with big eyes · #happy #joy #haha');
+    session.change('#');
+    assert.equal(session.picker.items, originalItems); // No tag chooser or custom tag filtering.
+    await session.cancel();
+});
+
+test('description toggle shows and hides tags without changing copy or insertion', async () => {
+    const session = openPicker({ property: 'name', settings: { 'picker.searchDescriptions': false }, dataset: [{
+        name: 'dog', emoji: '🐶', description: 'dog face', tags: ['pet'],
+    }] });
+    assert.equal(session.picker.items[0].detail, undefined);
+    session.toggleDescriptions();
+    assert.equal(session.picker.items[0].detail, 'dog face · #pet');
+    assert.equal(session.picker.matchOnDetail, true);
+    session.change('#pet');
+    session.toggleDescriptions();
+    assert.equal(session.picker.items[0].detail, undefined);
+    assert.equal(session.picker.matchOnDetail, false);
+    assert.equal(session.picker.value, '#pet');
+    session.toggleDescriptions();
+    assert.equal(session.picker.items[0].detail, 'dog face · #pet');
+    await session.copySelection();
+    assert.deepEqual(session.clipboardWrites, [':dog:']);
+    await session.accept();
+    assert.deepEqual(session.insertions, [':dog:']);
+});
 
 for (const property of ['emoji', 'name']) {
     for (const via of ['button', 'command']) {

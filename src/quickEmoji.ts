@@ -10,6 +10,10 @@ interface EmojiQuickPickItem extends QuickPickItem {
 const historyKey = 'picker.history';
 const historyLimit = 200;
 
+const detailFor = (emoji: Emoji) => emoji.tags.length
+    ? `${emoji.description} · ${emoji.tags.map(tag => `#${tag}`).join(' ')}`
+    : emoji.description;
+
 export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
     const items: EmojiQuickPickItem[] = provider.emojis.map((emoji) => {
         return ({ description: emoji.name, label: emoji.emoji, emoji });
@@ -56,7 +60,7 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
                     const rankedItems: EmojiQuickPickItem[] = orderedItems.map(item => ({
                         ...item,
                         description: preferExactMatch || preferPrefixMatch ? `:${item.emoji.name}:` : item.description,
-                        detail: searchDescriptions ? item.emoji.description : undefined,
+                        detail: searchDescriptions ? detailFor(item.emoji) : undefined,
                         buttons: [copy],
                     }));
                     picker.items = rankedItems;
@@ -135,7 +139,7 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
                         }
                         searchDescriptions = !searchDescriptions;
                         for (const item of rankedItems) {
-                            item.detail = searchDescriptions ? item.emoji.description : undefined;
+                            item.detail = searchDescriptions ? detailFor(item.emoji) : undefined;
                         }
                         const activeItems = picker.activeItems;
                         picker.matchOnDetail = searchDescriptions;
