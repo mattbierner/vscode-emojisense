@@ -78,14 +78,27 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
                         picker.items = displayedItems;
                         picker.activeItems = activeItems;
                     };
-                    const updateSpaceMatches = () => {
+                    const queryParts = (value: string) => {
+                        const terms = value.split(/ +/).filter(Boolean);
+                        const tags = searchDescriptions ? terms.filter(term => term.startsWith('#') && term.length > 1) : [];
+                        const text = tags.length ? terms.filter(term => !tags.includes(term)).join(' ') : value;
+                        return { tags, text: ignoreSpaces ? text.replace(/ /g, '') : text };
+                    };
+                    const matchesTags = (item: EmojiQuickPickItem, tags: readonly string[]) => tags.every(tag =>
+                        item.emoji.tags.some(candidate => matchesPickerQuery(tag, `#${candidate}`)));
+                    const updateExtraMatches = () => {
                         const value = picker.value;
                         const normalized = value.replace(/ /g, '');
                         const needsFallback = ignoreSpaces && normalized !== value;
+                        const { tags, text: query } = queryParts(value);
+                        const combined = tags.length > 0 && (query.trim().length > 0 || tags.length > 1);
                         let changed = false;
                         for (const item of rankedItems) {
-                            const alwaysShow = needsFallback && [item.label, item.description || '', item.detail || '']
-                                .some(text => matchesPickerQuery(normalized, text));
+                            const fields = [item.label, item.description || '', item.detail || ''];
+                            const alwaysShow = combined
+                                ? matchesTags(item, tags)
+                                    && fields.some(text => matchesPickerQuery(query, text))
+                                : needsFallback && fields.some(text => matchesPickerQuery(normalized, text));
                             if (!!item.alwaysShow !== alwaysShow) {
                                 item.alwaysShow = alwaysShow;
                                 changed = true;
@@ -159,52 +172,51 @@ export const quickEmoji = (provider: EmojiProvider, historyState: Memento) => {
                         }
                         const activeItems = picker.activeItems;
                         picker.matchOnDetail = searchDescriptions;
-                        updateSpaceMatches();
+                        updateExtraMatches();
                         picker.items = displayedItems;
                         picker.activeItems = activeItems;
                         updateControls();
                     }));
-                    if (preferExactMatch || preferPrefixMatch || ignoreSpaces) {
-                        disposables.push(picker.onDidChangeValue(value => {
-                            const query = ignoreSpaces ? value.replace(/ /g, '') : value;
-                            const spaceMatchesChanged = updateSpaceMatches();
-                            if (!preferExactMatch && !preferPrefixMatch) {
-                                if (spaceMatchesChanged) {
-                                    refreshItems();
-                                }
-                                return;
+                    disposables.push(picker.onDidChangeValue(value => {
+                        const { tags, text: query } = queryParts(value);
+                        const extraMatchesChanged = updateExtraMatches();
+                        if (!preferExactMatch && !preferPrefixMatch) {
+                            if (extraMatchesChanged) {
+                                refreshItems();
                             }
-                            const name = query.trim().replace(/^:|:$/g, '').toLowerCase();
-                            let exactMatch: EmojiQuickPickItem | undefined;
-                            const prefixMatches: EmojiQuickPickItem[] = [];
-                            const otherItems: EmojiQuickPickItem[] = [];
+                            return;
+                        }
+                        const name = query.trim().replace(/^:|:$/g, '').toLowerCase();
+                        let exactMatch: EmojiQuickPickItem | undefined;
+                        const prefixMatches: EmojiQuickPickItem[] = [];
+                        const otherItems: EmojiQuickPickItem[] = [];
 
-                            for (const item of rankedItems) {
-                                const itemName = item.emoji.name.toLowerCase();
-                                if (name && preferExactMatch && itemName === name) {
-                                    exactMatch = item;
-                                } else if (name && preferPrefixMatch && itemName.startsWith(name)) {
-                                    prefixMatches.push(item);
-                                } else {
-                                    otherItems.push(item);
-                                }
+                        for (const item of rankedItems) {
+                            const itemName = item.emoji.name.toLowerCase();
+                            const eligible = matchesTags(item, tags);
+                            if (eligible && name && preferExactMatch && itemName === name) {
+                                exactMatch = item;
+                            } else if (eligible && name && preferPrefixMatch && itemName.startsWith(name)) {
+                                prefixMatches.push(item);
+                            } else {
+                                otherItems.push(item);
                             }
+                        }
 
-                            // EmojiProvider has one item per shortcode, so at most one is exact.
-                            // Reorder the full list; let VS Code keep filtering fuzzy matches.
-                            const nextItems = exactMatch
-                                ? [exactMatch, ...prefixMatches, ...otherItems]
-                                : [...prefixMatches, ...otherItems];
-                            if (spaceMatchesChanged || nextItems.some((item, index) => item !== displayedItems[index])) {
-                                picker.items = nextItems;
-                                displayedItems = nextItems;
-                            }
-                            const bestMatch = exactMatch || prefixMatches[0];
-                            if (bestMatch) {
-                                picker.activeItems = [bestMatch];
-                            }
-                        }));
-                    }
+                        // EmojiProvider has one item per shortcode, so at most one is exact.
+                        // Reorder the full list; let VS Code keep filtering fuzzy matches.
+                        const nextItems = exactMatch
+                            ? [exactMatch, ...prefixMatches, ...otherItems]
+                            : [...prefixMatches, ...otherItems];
+                        if (extraMatchesChanged || nextItems.some((item, index) => item !== displayedItems[index])) {
+                            picker.items = nextItems;
+                            displayedItems = nextItems;
+                        }
+                        const bestMatch = exactMatch || prefixMatches[0];
+                        if (bestMatch) {
+                            picker.activeItems = [bestMatch];
+                        }
+                    }));
                     disposables.push(picker.onDidAccept(() => {
                         resolve(picker.selectedItems[0]);
                         picker.hide();

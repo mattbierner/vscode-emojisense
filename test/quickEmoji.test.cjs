@@ -217,6 +217,51 @@ test('tags are appended to readable descriptions for native hashtag filtering', 
     await session.cancel();
 });
 
+for (const ignoreSpaces of [true, false]) {
+    test(`tags match independently of text position with ignoreSpaces=${ignoreSpaces}`, async t => {
+        const session = openPicker({ settings: { 'picker.ignoreSpaces': ignoreSpaces }, dataset: [
+            { name: 'smiley', emoji: '😃', description: 'grinning face with big eyes', tags: ['happy', 'joy'] },
+            { name: 'cat', emoji: '🐱', description: 'cat face', tags: ['pet'] },
+            { name: 'tada', emoji: '🎉', description: 'party popper', tags: ['happy'] },
+        ] });
+        t.after(() => session.cancel());
+        for (const query of ['#happy face', 'face #happy', '#joy face #happy', '#happy #joy face']) {
+            session.change(query);
+            assert.equal(session.picker.value, query);
+            assert.deepEqual(session.picker.items.filter(item => item.alwaysShow).map(item => item.emoji.name), ['smiley']);
+        }
+        session.change('#happy #joy');
+        assert.deepEqual(session.picker.items.filter(item => item.alwaysShow).map(item => item.emoji.name), ['smiley']);
+        session.change('#happy missing');
+        assert(session.picker.items.every(item => !item.alwaysShow));
+        session.change('#happy face');
+        session.toggleDescriptions();
+        assert(session.picker.items.every(item => !item.alwaysShow));
+        session.toggleDescriptions();
+        assert.equal(session.picker.items.find(item => item.emoji.name === 'smiley').alwaysShow, true);
+        session.change('face');
+        assert(session.picker.items.every(item => !item.alwaysShow));
+    });
+}
+
+test('tag and shortcode query keeps exact ranking and copying with ranking preferences disabled too', async () => {
+    for (const preferences of [true, false]) {
+        const session = openPicker({ property: 'name', settings: {
+            'picker.preferExactMatch': preferences, 'picker.preferPrefixMatch': preferences, 'picker.ignoreSpaces': false,
+        }, dataset: [
+            { name: 'smiley', emoji: '😃', description: 'grinning face', tags: ['happy'] },
+            { name: 'smile', emoji: '😄', description: 'smiling face', tags: ['happy'] },
+        ] });
+        session.change('#happy smile');
+        if (preferences) assert.equal(session.picker.activeItems[0].emoji.name, 'smile');
+        session.select('smile');
+        await session.copySelection();
+        assert.deepEqual(session.clipboardWrites, [':smile:']);
+        await session.accept();
+        assert.deepEqual(session.insertions, [':smile:']);
+    }
+});
+
 test('description toggle shows and hides tags without changing copy or insertion', async () => {
     const session = openPicker({ property: 'name', settings: { 'picker.searchDescriptions': false }, dataset: [{
         name: 'dog', emoji: '🐶', description: 'dog face', tags: ['pet'],
@@ -470,7 +515,7 @@ test('mode switching works with input preferences disabled and cancellation rese
     session.change('cat face');
     session.toggleInsertionMode();
     assert.equal(session.picker.value, 'cat face');
-    assert.equal(session.hasChangeHandler, false);
+    assert.equal(session.hasChangeHandler, true);
     assert.deepEqual(session.names, originalNames);
     await session.cancel();
     assert.deepEqual(session.insertions, []);
@@ -572,13 +617,13 @@ test('descriptions can be shown when all input preferences start disabled', asyn
         'picker.preferPrefixMatch': false, 'picker.ignoreSpaces': false,
     } });
     t.after(() => session.cancel());
-    assert.equal(session.hasChangeHandler, false);
+    assert.equal(session.hasChangeHandler, true);
     assert.equal(session.picker.matchOnDetail, false);
     session.toggleDescriptions();
     assert.equal(session.picker.matchOnDetail, true);
     assert.deepEqual(session.picker.items.map(item => item.detail), emojis.map(item => item.description));
     assert.deepEqual(session.names, originalNames);
-    assert.equal(session.hasChangeHandler, false);
+    assert.equal(session.hasChangeHandler, true);
 });
 
 test('description toggle is local to the open picker and does not change the saved default', async t => {
@@ -615,7 +660,7 @@ test('description search works independently of exact and prefix preferences', a
     } });
     t.after(() => session.cancel());
     assert.equal(session.picker.matchOnDetail, true);
-    assert.equal(session.hasChangeHandler, false);
+    assert.equal(session.hasChangeHandler, true);
     assert.deepEqual(session.picker.items.map(item => item.detail), emojis.map(emoji => emoji.description));
 });
 
@@ -770,7 +815,7 @@ test('all input preferences off preserves original presentation, list identity, 
     } });
     t.after(() => session.cancel());
     const initialItems = session.picker.items;
-    assert.equal(session.hasChangeHandler, false);
+    assert.equal(session.hasChangeHandler, true);
     assert.deepEqual(initialItems.map(({ label, description }) => ({ label, description })),
         emojis.map(emoji => ({ label: emoji.emoji, description: emoji.name })));
     for (const query of ['smile', ':smile:', 'smi', '', 'missing']) session.change(query);
@@ -896,7 +941,7 @@ test('history remains shared when both match preferences are disabled', async t 
     } });
     t.after(() => session.cancel());
     assert.equal(session.names[0], 'cat');
-    assert.equal(session.hasChangeHandler, false);
+    assert.equal(session.hasChangeHandler, true);
     assert.equal(session.picker.items[0].description, 'cat');
 });
 
