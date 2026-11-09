@@ -28,7 +28,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     let providerSub = registerProviders(provider, config);
 
-    const emojiPicker = quickEmoji(emoji);
+    const emojiPicker = quickEmoji(emoji, context.globalState);
     context.subscriptions.push(
         vscode.commands.registerCommand('emojisense.quickEmoji', emojiPicker('emoji', 'editor')),
         vscode.commands.registerCommand('emojisense.quickEmojitext', emojiPicker('name', 'editor')),

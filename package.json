@@ -37,6 +37,18 @@
   "contributes": {
     "commands": [
       {
+        "command": "emojisense.copyPickerSelection",
+        "title": "Copy selected emoji / :shortcode:",
+        "category": "Emojisense",
+        "enablement": "emojisense.pickerOpen"
+      },
+      {
+        "command": "emojisense.togglePickerInsertionMode",
+        "title": "Toggle emoji / :shortcode: insertion",
+        "category": "Emojisense",
+        "enablement": "emojisense.pickerOpen"
+      },
+      {
         "command": "emojisense.quickEmoji",
         "title": "Pick an emoji and insert in editor",
         "category": "Emojisense"
@@ -60,6 +72,14 @@
     "menus": {
       "commandPalette": [
         {
+          "command": "emojisense.copyPickerSelection",
+          "when": "false"
+        },
+        {
+          "command": "emojisense.togglePickerInsertionMode",
+          "when": "false"
+        },
+        {
           "command": "emojisense.quickEmojiTerminal",
           "when": "panelFocus && activeViewlet == 'workbench.panel.terminal'"
         },
@@ -70,6 +90,19 @@
       ]
     },
     "keybindings": [
+      {
+        "mac": "cmd+c",
+        "key": "ctrl+c",
+        "command": "emojisense.copyPickerSelection",
+        "when": "emojisense.pickerOpen && inQuickOpen"
+      },
+      {
+        "mac": "shift+cmd+i",
+        "key": "shift+ctrl+i",
+        "linux": "shift+ctrl+alt+i",
+        "command": "emojisense.togglePickerInsertionMode",
+        "when": "emojisense.pickerOpen && inQuickOpen"
+      },
       {
         "mac": "cmd+i",
         "key": "ctrl+i",
@@ -100,6 +133,26 @@
     "configuration": {
       "title": ":emojisense:",
       "properties": {
+        "emojisense.picker.ignoreSpaces": {
+          "type": "boolean",
+          "markdownDescription": "Ignore literal space characters when matching picker input, so `s mile` matches `smile` while the typed spaces remain visible. Tabs and other whitespace characters are not ignored.",
+          "default": true
+        },
+        "emojisense.picker.searchDescriptions": {
+          "type": "boolean",
+          "markdownDescription": "Show and search human-readable emoji descriptions and #tags in both pickers, such as `grinning face with big eyes · #happy #joy #haha`. Shortcode matching remains enabled.",
+          "default": true
+        },
+        "emojisense.picker.preferExactMatch": {
+          "type": "boolean",
+          "markdownDescription": "Rank exact emoji shortcode matches first and automatically focus them in the picker. Accepts names with or without surrounding colons, such as `smile` or `:smile:`. Other fuzzy matches remain available.",
+          "default": true
+        },
+        "emojisense.picker.preferPrefixMatch": {
+          "type": "boolean",
+          "markdownDescription": "Rank emoji shortcodes starting with the input ahead of other fuzzy matches in the picker. Exact matches take priority when preferExactMatch is enabled.",
+          "default": true
+        },
         "emojisense.unicodeCompletionsEnabled": {
           "type": "boolean",
           "markdownDescription": "Enable completions that insert emoji as unicode, i.e. `:smile_cat:` -> 😸",
@@ -165,6 +218,7 @@
     }
   },
   "scripts": {
+    "test": "node --test",
     "compile": "webpack --config ./build/webpack.config.js",
     "watch": "webpack --watch --config ./build/webpack.config.js",
     "package": "webpack --mode production --config ./build/webpack.config.js",
